@@ -1,0 +1,48 @@
+# -------------------------------------------
+#            Duels Config
+# -------------------------------------------
+  
+#database
+username: ""
+password: ""
+
+#lobby spwanlocation
+lobbyworldname: lobby
+spawnloc:
+  x: 0.5
+  y: 90
+  z: 0.5
+  yaw: 180
+
+firstarenacenter: 
+    x: 100
+    y: 10
+    z: 125
+    yaw: 0
+
+duels1v1:
+  gamesavailable: 25
+
+duels2v2:
+  gamesavailable: 7
+
+duels4v4:
+  gamesavailable: 2
+  
+kits:
+  classic:
+    menuitem: IRON_SWORD
+    items:
+      IRON_SWORD: 1
+      BOW: 1
+      FLINT_AND_STEEL: 1
+      ARROW: 5
+      FISHING_ROD: 1
+  classic:
+    menuitem: IRON_SWORD
+    items:
+      IRON_SWORD: 1
+      BOW: 1
+      FLINT_AND_STEEL: 1
+      ARROW: 5
+      FISHING_ROD: 1
