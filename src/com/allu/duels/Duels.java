@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 
-public class Duels extends JavaPlugin implements Listener{
+public class Duels extends JavaPlugin implements Listener {
 	
 	public static Duels plugin;
 	

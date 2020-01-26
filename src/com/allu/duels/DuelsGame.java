@@ -20,7 +20,7 @@ public class DuelsGame implements CountDownTimerListener {
 	private Gamemode gameMode;
 	
 	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
-	private Location spawnCenter1, spawnCenter2;
+	private Location spawn1, spawn2;
 	
 	private CountDownTimer timer;
 	private Lobby lobby;
@@ -28,16 +28,17 @@ public class DuelsGame implements CountDownTimerListener {
 	
 	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode) {
 		this.lobby = lobby;
-		this.spawnCenter1 = arenaCenterLoc.clone().add(0, 0, -30);
-		this.spawnCenter2 = arenaCenterLoc.clone().add(0, 0, 30);
+		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -30);
+		this.spawn2 = arenaCenterLoc.clone().add(0, 0, 30);
 		this.gameMode = gameMode;
 		this.timer = new CountDownTimer(this);
 	}
 	
 	public void joinGame(DuelsPlayer dp) {
 		players.add(dp);
-		if(gameCanBeStart()) {
-			currentGameState = GameState.STARTING;
+		currentGameState = GameState.STARTING;
+		getSpawn(dp.getPlayer());
+		if(gameCanBeStart()) {	
 			startGame();
 		}
 	}
@@ -117,9 +118,9 @@ public class DuelsGame implements CountDownTimerListener {
 	private void getSpawn(Player p) {
 		for(int i = 0; i < players.size(); i++) {
 			if(players.size() % 2 == 0) {
-				p.teleport(spawnCenter1);
+				p.teleport(spawn1);
 			} else {
-				p.teleport(spawnCenter2);
+				p.teleport(spawn2);
 			}
 		}
 	}

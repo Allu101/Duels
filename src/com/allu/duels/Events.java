@@ -1,5 +1,8 @@
 package com.allu.duels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -23,11 +26,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.allu.duels.DuelsPlayer.PlayerState;
+import com.allu.duels.utils.ChallengeCreatedEvent;
+import com.allu.duels.utils.Gamemode;
 
 
 public class Events implements Listener, CommandExecutor {
-
+	
+	private List<ChallengeCreatedEvent> challenges = new ArrayList<ChallengeCreatedEvent>();
+	
 	private Lobby lobby;
 	private MenuHandler menuHandler;
 
@@ -43,37 +49,55 @@ public class Events implements Listener, CommandExecutor {
 			return true;
 		}
 		Player p = (Player)sender;
-		DuelsPlayer dp = lobby.getDuelsPlayer(p);
-		if(cmd.getName().equalsIgnoreCase("duel") && args.length == 1) {
-			if(args[0].equalsIgnoreCase("accept")) {
-				if(dp.getPlayerState() == PlayerState.RECEIVED_REQUEST) {
-					dp.setPlayerState(PlayerState.NORMAL);
-//					DuelsGame game = lobby.getFreeGame(games);
-					dp.getRequesterPlayer().getGameWhereJoined().joinGame(dp);
-				} else {
-					p.sendMessage(ChatColor.RED + "Kukaan ei ole lähettänyt sinulle duels pyyntöä.");
+		if(cmd.getName().equalsIgnoreCase("duel")) {
+			DuelsPlayer dp = lobby.getDuelsPlayer(p);
+			if(args.length == 1) {
+				Player opponent = Bukkit.getPlayerExact(args[0].toString());
+				if(opponent == null) {
+					p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
+					return true;
 				}
-				return true;
-			}
-			Player opponentP = Bukkit.getPlayerExact(args[0].toString());
-			if(opponentP == null) {
-				p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
+				String opponentName = opponent.getName();
+				if(args[0].equalsIgnoreCase(opponentName)) {
+					if(p.getName().equals(opponentName)) {
+						p.sendMessage(ChatColor.RED + "Et voi haastaa itseasi duelsiin.");
+						return true;
+					}
+					p.openInventory(menuHandler.createKitMenu(p));
+					dp.setChallengedPlayer(opponent);
+					
+				}
 				return true;
 			}
 			
-			if(args[0].equalsIgnoreCase(opponentP.getName())) {
-				if(p.getName().equals(opponentP.getName())) {
-					p.sendMessage(ChatColor.RED + "Et voi haastaa itseasi duelsiin.");
-					return true;
+			if(args[0].equalsIgnoreCase("accept")) {
+				if(args.length > 1) {
+					Player player = Bukkit.getPlayerExact(args[1]);
+					if(player != null) {
+						for(ChallengeCreatedEvent e : challenges) {
+							if(e.getPlayer().equals(player) && e.getOpponent().equals(p)) {
+								DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
+								if(game != null) {
+									game.joinGame(lobby.getDuelsPlayer(player));
+									game.joinGame(dp);
+								}
+							}
+						}
+					}
+				} else {
+					p.sendMessage(ChatColor.RED + "Hyväksy pyyntö /duels accept <pelaajan_nimi> tai klikkaamalla tästä.");
 				}
-				p.openInventory(menuHandler.createKitMenu(p));
+				return true;
 				
-				p.sendMessage(ChatColor.AQUA + "Haastoit pelaajan" + opponentP.getName() + "1v1 duelsiin");
-				opponentP.sendMessage(ChatColor.GREEN + p.getName() + " haastoi sinut Duelsiin.");
-				opponentP.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla" + ChatColor.BLUE + "/duels accept.");
-				DuelsPlayer opponentDuelsP = lobby.getDuelsPlayer(opponentP);
-				opponentDuelsP.setPlayerState(PlayerState.RECEIVED_REQUEST);
-				opponentDuelsP.setRequesterPlayer(dp);
+//				if(dp.getPlayerState() == PlayerState.RECEIVED_REQUEST) {
+//					dp.setPlayerState(PlayerState.NORMAL);
+					
+//					dp.getRequesterPlayer().getGameWhereJoined().joinGame(dp);
+//				} else {
+//					p.sendMessage(ChatColor.RED + "Kukaan ei ole lähettänyt sinulle duels pyyntöä.");
+//				}
+//				return true;
+				
 			}
 			return true;
 		}
@@ -82,23 +106,27 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
-		if(lobby.isLobbyWorld(e.getPlayer())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
-		if(lobby.isLobbyWorld(e.getPlayer())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onChallengeCreated(ChallengeCreatedEvent e) {
+		challenges.add(e);
+		Player p = e.getPlayer();
+		Player opponent = e.getOpponent();
+		p.sendMessage(ChatColor.AQUA + "Haastoit pelaajan" + opponent.getName() + "1v1 duelsiin");
+		opponent.sendMessage(ChatColor.GREEN + p.getName() + " haastoi sinut Duelsiin.");
+		opponent.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla" + ChatColor.BLUE + "/duels accept" + p.getName() + ".");
 	}
 	
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent e) {
-		if(lobby.isLobbyWorld((Player) e.getEntity())) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(true);
 	}
 	
 	@EventHandler
@@ -107,7 +135,12 @@ public class Events implements Listener, CommandExecutor {
 		if(is == null || is.getType().equals(Material.AIR)) {
 			return;
 		}
-		menuHandler.inventoryClickHandler((Player)e.getWhoClicked(), e);
+		Player p = (Player) e.getWhoClicked();
+		if(e.getClick().isKeyboardClick() && !p.getWorld().getName().equals(Duels.getLobbyWorldName())) {
+			return;
+		}
+		e.setCancelled(true);
+		menuHandler.inventoryClickHandler(lobby.getDuelsPlayer(p), e.getCurrentItem());
 	}
 	
 	@EventHandler

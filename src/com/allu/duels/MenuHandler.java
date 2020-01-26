@@ -1,13 +1,14 @@
 package com.allu.duels;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.allu.duels.utils.ChallengeCreatedEvent;
 import com.allu.duels.utils.ItemHelpper;
 import com.allu.duels.utils.Kit;
 
@@ -15,8 +16,9 @@ public class MenuHandler {
 	
 	private ItemStack queue_join_item;
 	
-	private ItemHelpper itemHelpper;
 	private Duels duels;
+	private ItemHelpper itemHelpper;
+	private Lobby lobby;
 
 	public MenuHandler(Duels duels) {
 		this.duels = duels;
@@ -24,12 +26,16 @@ public class MenuHandler {
 		queue_join_item = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "Liity 2v2 jonoon");
 	}
 	
-	public void inventoryClickHandler(Player p, InventoryClickEvent e) {
-		if(e.getClick().isKeyboardClick() && !p.getWorld().getName().equals(Duels.getLobbyWorldName())) {
-			return;
+	public void inventoryClickHandler(DuelsPlayer dp, ItemStack is) {
+		if(is.equals(queue_join_item)) {
+			
 		}
-		e.setCancelled(true);
-		handleInventoryClick(e.getCurrentItem());
+		for(Kit kit : duels.getKits()) {
+			if(is.equals(kit.getMenuItem())) {
+				ChallengeCreatedEvent event = new ChallengeCreatedEvent(dp.getPlayer(), dp.getChallengedPlayer(), kit);
+				Bukkit.getServer().getPluginManager().callEvent(event);
+			}
+		}
 	}
 	
 	public Inventory createKitMenu(Player p) {
@@ -50,19 +56,10 @@ public class MenuHandler {
 		PlayerInventory pInv = p.getInventory();
 		pInv.setItem(0, queue_join_item);
 	}
-	
-	private void handleInventoryClick(ItemStack is) {
-		if(is.equals(queue_join_item)) {
-			
-		}
-		for(Kit duel : duels.getKits()) {
-			if(is.equals(duel.getMenuItem())) {
-				
-			}
-		}
-	}
-	
-	private void getKitToPlayer(Player p) {
+
+	public void addLobby(Lobby lobby) {
+		this.lobby = lobby;
 		
 	}
+
 }

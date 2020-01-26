@@ -9,9 +9,9 @@ password: ""
 #lobby spwanlocation
 lobbyworldname: lobby
 spawnloc:
-  x: 0.5
-  y: 90
-  z: 0.5
+  x: -5.5
+  y: 11
+  z: 15.5
   yaw: 180
 
 firstarenacenter: 
@@ -38,7 +38,7 @@ kits:
       FLINT_AND_STEEL: 1
       ARROW: 5
       FISHING_ROD: 1
-  classic:
+  joku:
     menuitem: IRON_SWORD
     items:
       IRON_SWORD: 1

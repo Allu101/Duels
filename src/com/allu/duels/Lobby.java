@@ -15,9 +15,9 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Lobby {
 	
-	public ArrayList<DuelsPlayer> lobbyPlayers = new ArrayList<DuelsPlayer>();
 	public String LINE = ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "                                                                            ";
 	
+	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	private ArrayList<DuelsGame> games = new ArrayList<DuelsGame>();
 	private Location spawnLocation;
 	
@@ -27,23 +27,11 @@ public class Lobby {
 		spawnLocation = new Location(Bukkit.getWorld(config.getString("lobbyworldname")), config.getInt("spawnloc.x"), config.getInt("spawnloc.y"), config.getInt("spawnloc.z"), 
 				config.getInt("spawnloc.yaw"), config.getInt("spawnloc.pitch"));
 		this.menuHandler = menuHandler;
+		menuHandler.addLobby(this);
 	}
 	
 	public void addGame(DuelsGame game) {
 		games.add(game);
-	}
-	
-	public boolean isLobbyWorld(Player p) {
-		return p.getWorld().getName().equals(Duels.getLobbyWorldName());
-	}
-	
-	public DuelsPlayer getDuelsPlayer(Player p) {
-		for(DuelsPlayer dp : lobbyPlayers) {
-			if(dp.is(p.getUniqueId().toString())) {
-				return dp;
-			}
-		}
-		return null;
 	}
 	
 	public DuelsGame getFreeGame(Gamemode gamemode) {
@@ -55,15 +43,27 @@ public class Lobby {
 		return null;
 	}
 	
+	public DuelsPlayer getDuelsPlayer(Player p) {
+		for(DuelsPlayer dp : players) {
+			if(dp.is(p.getUniqueId().toString())) {
+				return dp;
+			}
+		}
+		return null;
+	}
+	
+	public boolean isLobbyWorld(Player p) {
+		return p.getWorld().getName().equals(Duels.getLobbyWorldName());
+	}
+	
 	public void onPlayerJoin(Player p) {
 		DuelsPlayer dp = new DuelsPlayer(p);
-		lobbyPlayers.add(dp);
+		players.add(dp);
 		teleportToSpawn(p);
-		PrefixHandler.setChatPrefix(p, ChatColor.GOLD + "[1✧]");
 	}
 	
 	public void onPlayerLeave(DuelsPlayer dp) {	
-		lobbyPlayers.remove(dp);
+		players.remove(dp);
 	}
 	
 	public void teleportToSpawn(Player p) {
@@ -71,4 +71,5 @@ public class Lobby {
 		p.setGameMode(GameMode.ADVENTURE);
 		menuHandler.setLobbyItems(p);
 	}
+	
 }

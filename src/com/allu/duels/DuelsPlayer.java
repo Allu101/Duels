@@ -4,11 +4,8 @@ import org.bukkit.entity.Player;
 
 public class DuelsPlayer {
 	
-	public enum PlayerState { NORMAL, RECEIVED_REQUEST }
-	public PlayerState playerState = PlayerState.NORMAL;
-	
 	private Player player;
-	private DuelsPlayer requesterPlayer;
+	private Player challengedPlayer;
 	private DuelsGame gameWhereJoined;
 	
 	private int bestWinStreak;
@@ -23,25 +20,17 @@ public class DuelsPlayer {
 	public Player getPlayer() {
 		return player;
 	}
-
-	public PlayerState getPlayerState() {
-		return playerState;
-	}
 	
 	public boolean is(String uuid) {
 		return uuid.equals(player.getUniqueId().toString());
 	}
-	
-	public void setPlayerState(PlayerState playerState) {
-		this.playerState = playerState;
+
+	public Player getChallengedPlayer() {
+		return challengedPlayer;
 	}
 
-	public DuelsPlayer getRequesterPlayer() {
-		return requesterPlayer;
-	}
-
-	public void setRequesterPlayer(DuelsPlayer dp) {
-		this.requesterPlayer = dp;
+	public void setChallengedPlayer(Player p) {
+		this.challengedPlayer = p;
 	}
 
 	public DuelsGame getGameWhereJoined() {
