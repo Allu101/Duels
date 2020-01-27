@@ -9,7 +9,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.allu.duels.utils.Gamemode;
-import com.allu.minigameapi.nameManager.PrefixHandler;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -27,7 +26,6 @@ public class Lobby {
 		spawnLocation = new Location(Bukkit.getWorld(config.getString("lobbyworldname")), config.getInt("spawnloc.x"), config.getInt("spawnloc.y"), config.getInt("spawnloc.z"), 
 				config.getInt("spawnloc.yaw"), config.getInt("spawnloc.pitch"));
 		this.menuHandler = menuHandler;
-		menuHandler.addLobby(this);
 	}
 	
 	public void addGame(DuelsGame game) {

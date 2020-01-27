@@ -18,7 +18,6 @@ public class MenuHandler {
 	
 	private Duels duels;
 	private ItemHelpper itemHelpper;
-	private Lobby lobby;
 
 	public MenuHandler(Duels duels) {
 		this.duels = duels;
@@ -28,24 +27,26 @@ public class MenuHandler {
 	
 	public void inventoryClickHandler(DuelsPlayer dp, ItemStack is) {
 		if(is.equals(queue_join_item)) {
-			
+			dp.getPlayer().sendMessage("T‰st‰ ei viel‰ tapahdu mit‰‰n. :p");
+			return;
 		}
 		for(Kit kit : duels.getKits()) {
 			if(is.equals(kit.getMenuItem())) {
-				ChallengeCreatedEvent event = new ChallengeCreatedEvent(dp.getPlayer(), dp.getChallengedPlayer(), kit);
+				ChallengeCreatedEvent event = new ChallengeCreatedEvent(dp, dp.getChallengedPlayer(), kit);
 				Bukkit.getServer().getPluginManager().callEvent(event);
 			}
 		}
 	}
 	
-	public Inventory createKitMenu(Player p) {
-		Inventory inv = p.getServer().createInventory(null, 36, ChatColor.BLUE + "" + ChatColor.BOLD + "Valise kitti");
+	public Inventory createKitMenu() {
+		Inventory inv = Bukkit.getServer().createInventory(null, 36, ChatColor.BLUE + "" + ChatColor.BOLD + "Valise kitti");
 		int i = 10;
 		for(Kit kit : duels.getKits()) {
 			if(i % 8 == 0) {
 				i += 2;
 			}
-			inv.setItem(i, kit.getMenuItem());
+			inv.setItem(i, itemHelpper.createItemWithTitle(kit.getMenuItem().getType(), kit.getName() + " Duel"
+					, ChatColor.YELLOW + "Klikkaa liitty‰ksesi."));
 			i++;
 		}
 		return inv;
@@ -56,10 +57,5 @@ public class MenuHandler {
 		PlayerInventory pInv = p.getInventory();
 		pInv.setItem(0, queue_join_item);
 	}
-
-	public void addLobby(Lobby lobby) {
-		this.lobby = lobby;
-		
-	}
-
+	
 }

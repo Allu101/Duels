@@ -104,7 +104,7 @@ public class Duels extends JavaPlugin implements Listener {
 			for(String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
 				kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(kitPath + "." + item)));
 			}
-			Kit kit = new Kit(new ItemStack(Material.getMaterial(config.getString(kitPath + ".menuitem"))), kitItems);
+			Kit kit = new Kit(new ItemStack(Material.getMaterial(config.getString(kitPath + ".menuitem"))), kitItems, key);
 			kits.add(kit);
 			kitItems.clear();
 		}

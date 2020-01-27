@@ -1,34 +1,44 @@
 package com.allu.duels.utils;
 
 
-import org.bukkit.entity.Player;
+import java.util.List;
+
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import com.allu.duels.DuelsPlayer;
 
 public final class ChallengeCreatedEvent extends Event {
 	
 	private static final HandlerList handlers = new HandlerList();
 	
-	private Player player;
-	private Player opponent;
+	private DuelsPlayer duelsPlayer;
+	private List<DuelsPlayer> players;
+	
 	private Kit kit;
 	
-	public ChallengeCreatedEvent(Player challenger, Player opponent, Kit kit) {
-		this.player = challenger;
-		this.opponent = opponent;
+	public ChallengeCreatedEvent(DuelsPlayer challenger, List<DuelsPlayer> players, Kit kit) {
+		this.duelsPlayer = challenger;
+		this.players = players;
 		this.kit = kit;
 	}
 	
-	public Player getPlayer() {
-		return player;
-	}
-	
-	public Player getOpponent() {
-		return opponent;
+	public ChallengeCreatedEvent(DuelsPlayer challenger, DuelsPlayer opponent, Kit kit) {
+		this.duelsPlayer = challenger;
+		this.players.add(challenger);
+		this.kit = kit;
 	}
 	
 	public Kit getKit() {
 		return kit;
+	}
+	
+	public DuelsPlayer getDuelsPlayer() {
+		return duelsPlayer;
+	}
+	
+	public List<DuelsPlayer> getDuelsPlayers() {
+		return players;
 	}
 	
 	public HandlerList getHandlers() {

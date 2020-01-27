@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 public class DuelsPlayer {
 	
 	private Player player;
-	private Player challengedPlayer;
+	private DuelsPlayer challengedPlayer;
 	private DuelsGame gameWhereJoined;
 	
 	private int bestWinStreak;
@@ -25,12 +25,12 @@ public class DuelsPlayer {
 		return uuid.equals(player.getUniqueId().toString());
 	}
 
-	public Player getChallengedPlayer() {
+	public DuelsPlayer getChallengedPlayer() {
 		return challengedPlayer;
 	}
 
-	public void setChallengedPlayer(Player p) {
-		this.challengedPlayer = p;
+	public void setChallengedPlayer(DuelsPlayer dp) {
+		this.challengedPlayer = dp;
 	}
 
 	public DuelsGame getGameWhereJoined() {

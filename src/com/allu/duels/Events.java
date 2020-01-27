@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,7 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -63,9 +63,8 @@ public class Events implements Listener, CommandExecutor {
 						p.sendMessage(ChatColor.RED + "Et voi haastaa itseasi duelsiin.");
 						return true;
 					}
-					p.openInventory(menuHandler.createKitMenu(p));
-					dp.setChallengedPlayer(opponent);
-					
+					p.openInventory(menuHandler.createKitMenu());
+					dp.setChallengedPlayer(lobby.getDuelsPlayer(opponent));
 				}
 				return true;
 			}
@@ -73,31 +72,24 @@ public class Events implements Listener, CommandExecutor {
 			if(args[0].equalsIgnoreCase("accept")) {
 				if(args.length > 1) {
 					Player player = Bukkit.getPlayerExact(args[1]);
-					if(player != null) {
-						for(ChallengeCreatedEvent e : challenges) {
-							if(e.getPlayer().equals(player) && e.getOpponent().equals(p)) {
-								DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
-								if(game != null) {
-									game.joinGame(lobby.getDuelsPlayer(player));
-									game.joinGame(dp);
-								}
+					if(player == null) {
+						p.sendMessage("Tämän nimistä pelaajaa ei löydy.");
+						return true;
+					}
+					for(ChallengeCreatedEvent e : new ArrayList<ChallengeCreatedEvent>(challenges)) {
+						if(e.getDuelsPlayer().getPlayer().equals(player) && e.getDuelsPlayers().contains(dp)) {
+							DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
+							if(game != null) {
+								game.startGame(e.getDuelsPlayers(), e.getKit());
+								challenges.remove(e);
+								return true;
 							}
 						}
 					}
+					p.sendMessage(ChatColor.GRAY + "Kukaan ei ole lähettänyt sinulle duels pyyntöä.");
 				} else {
 					p.sendMessage(ChatColor.RED + "Hyväksy pyyntö /duels accept <pelaajan_nimi> tai klikkaamalla tästä.");
 				}
-				return true;
-				
-//				if(dp.getPlayerState() == PlayerState.RECEIVED_REQUEST) {
-//					dp.setPlayerState(PlayerState.NORMAL);
-					
-//					dp.getRequesterPlayer().getGameWhereJoined().joinGame(dp);
-//				} else {
-//					p.sendMessage(ChatColor.RED + "Kukaan ei ole lähettänyt sinulle duels pyyntöä.");
-//				}
-//				return true;
-				
 			}
 			return true;
 		}
@@ -106,22 +98,39 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
+		Player p = e.getPlayer();
+		DuelsGame game = lobby.getDuelsPlayer(p).getGameWhereJoined();
+		if(game != null && game.isGameOn()) {
+			Location bLoc = e.getBlock().getLocation();
+			if(game.getPlacedBlocks().contains(bLoc)) {
+				game.getPlacedBlocks().remove(bLoc);
+				return;
+			}
+		}
 		e.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
+		Player p = e.getPlayer();
+		DuelsGame game = lobby.getDuelsPlayer(p).getGameWhereJoined();
+		if(game != null && game.isGameOn()) {
+			game.getPlacedBlocks().add(e.getBlock().getLocation());
+			return;
+		}
 		e.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onChallengeCreated(ChallengeCreatedEvent e) {
 		challenges.add(e);
-		Player p = e.getPlayer();
-		Player opponent = e.getOpponent();
-		p.sendMessage(ChatColor.AQUA + "Haastoit pelaajan" + opponent.getName() + "1v1 duelsiin");
-		opponent.sendMessage(ChatColor.GREEN + p.getName() + " haastoi sinut Duelsiin.");
-		opponent.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla" + ChatColor.BLUE + "/duels accept" + p.getName() + ".");
+		DuelsPlayer duelsPlayer = e.getDuelsPlayer();
+		for(DuelsPlayer dp : e.getDuelsPlayers()) {
+			Player p = dp.getPlayer();
+			duelsPlayer.getPlayer().sendMessage(ChatColor.AQUA + "Haastoit pelaajan" + p.getName() + "1v1 duelsiin");
+			p.sendMessage(ChatColor.GREEN + p.getName() + " haastoi sinut Duelsiin.");
+			p.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla" + ChatColor.BLUE + "/duels accept" + p.getName() + ".");
+		}
 	}
 	
 	@EventHandler
@@ -144,7 +153,7 @@ public class Events implements Listener, CommandExecutor {
 	}
 	
 	@EventHandler
-	public void onPlayerDamage(EntityDamageEvent e) {
+	public void onPlayerDamage(EntityDamageByEntityEvent e) {
 		if(!(e.getEntity() instanceof Player)) {
 			return;
 		}
@@ -162,6 +171,7 @@ public class Events implements Listener, CommandExecutor {
 		
 		if(!gameWhereJoined.isGameOn()) {
 			e.setCancelled(true);
+			return;
 		}
 		
 		if(damaged.getHealth() - e.getDamage() > 0) {
@@ -196,21 +206,18 @@ public class Events implements Listener, CommandExecutor {
 		lobby.onPlayerLeave(dp);
 	}
 	
-	private Player getDamager(EntityDamageEvent e) {
-		if(e instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) e;
-			Entity damager = damageByEntityEvent.getDamager();
-			if(damager instanceof Arrow) {
-				Arrow arrow = (Arrow) damageByEntityEvent.getDamager();
-				if(arrow.getShooter() instanceof Player) {
-					return (Player) arrow.getShooter();
-				}
-			} else if(damager instanceof FishHook)  {
-				FishHook fh = (FishHook) damageByEntityEvent.getDamager();
-				return (Player) fh.getShooter();
-			} else if(damager instanceof Player) {
-				return (Player) damageByEntityEvent.getDamager();
+	private Player getDamager(EntityDamageByEntityEvent e) {
+		Entity damager = e.getDamager();
+		if(damager instanceof Arrow) {
+			Arrow arrow = (Arrow) damager;
+			if(arrow.getShooter() instanceof Player) {
+				return (Player) arrow.getShooter();
 			}
+		} else if(damager instanceof FishHook)  {
+			FishHook fh = (FishHook) damager;
+			return (Player) fh.getShooter();
+		} else if(damager instanceof Player) {
+			return (Player) damager;
 		}
 		return null;
 	}

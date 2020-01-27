@@ -9,12 +9,14 @@ public class Kit {
 	
 	private ItemStack menuItem;
 	private List<ItemStack> items = new ArrayList<ItemStack>();
+	private String name;
 	
-	public Kit(ItemStack menuItem, List<ItemStack> kitItems) {
+	public Kit(ItemStack menuItem, List<ItemStack> kitItems, String name) {
 		this.menuItem = menuItem;
 		this.items = kitItems;
+		this.name = name;
 	}
-
+	
 	public ItemStack getMenuItem() {
 		return menuItem;
 	}
@@ -23,4 +25,7 @@ public class Kit {
 		return items;
 	}
 	
+	public String getName() {
+		return name;
+	}
 }

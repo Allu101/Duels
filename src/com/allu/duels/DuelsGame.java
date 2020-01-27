@@ -1,24 +1,27 @@
 package com.allu.duels;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.allu.duels.utils.Gamemode;
+import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
 import com.allu.minigameapi.CountDownTimerListener;
 import com.allu.minigameapi.MessageHandler;
 
 public class DuelsGame implements CountDownTimerListener {
 	
-	public enum GameState { FREE, STARTING, PLAYING, GAME_FINISH }
-	public GameState currentGameState = GameState.FREE;
-	
+	private enum GameState { FREE, STARTING, PLAYING, GAME_FINISH }
+	private GameState currentGameState = GameState.FREE;
 	private Gamemode gameMode;
 	
+	private ArrayList<Location> buildedBlocks = new ArrayList<Location>();
 	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	private Location spawn1, spawn2;
 	
@@ -34,25 +37,20 @@ public class DuelsGame implements CountDownTimerListener {
 		this.timer = new CountDownTimer(this);
 	}
 	
-	public void joinGame(DuelsPlayer dp) {
-		players.add(dp);
-		currentGameState = GameState.STARTING;
-		getSpawn(dp.getPlayer());
-		if(gameCanBeStart()) {	
-			startGame();
-		}
-	}
-	
 	public void leaveGame(DuelsPlayer dp) {
 		players.remove(dp);
 	}
 	
-	public void startGame() {
-		for(DuelsPlayer dp : players) {
+	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
+		currentGameState = GameState.STARTING;
+		for(DuelsPlayer dp : dplayers) {
+			players.add(dp);
 			Player p = dp.getPlayer();
+			dp.setGameWhereJoined(this);
 			timer.addPlayer(p);
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0f);
 			getSpawn(p);
+			setKitItems(p, kit.getItems());
 		}
 		timer.start(5, "Duelsin alkuun");
 	}
@@ -73,8 +71,8 @@ public class DuelsGame implements CountDownTimerListener {
 				dp.setGameWhereJoined(null);
 			}
 			timer.clearPlayers();
-			currentGameState = GameState.FREE;
 			players.clear();
+			currentGameState = GameState.FREE;
 		}
 	}
 	
@@ -87,8 +85,16 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage(messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getName()));
 			p.sendMessage(messages.getCenteredMessage(""));
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
-			timer.start(5, "");
 		}
+		timer.start(5, "");
+	}
+	
+	public ArrayList<Location> getPlacedBlocks() {
+		return buildedBlocks;
+	}
+	
+	public Gamemode getGamemode() {
+		return gameMode;
 	}
 	
 	public boolean isFree() {
@@ -97,10 +103,6 @@ public class DuelsGame implements CountDownTimerListener {
 	
 	public boolean isGameOn() {
 		return currentGameState == GameState.PLAYING;
-	}
-	
-	public Gamemode getGamemode() {
-		return gameMode;
 	}
 	
 	@Override
@@ -122,6 +124,12 @@ public class DuelsGame implements CountDownTimerListener {
 			} else {
 				p.teleport(spawn2);
 			}
+		}
+	}
+	
+	private void setKitItems(Player p, List<ItemStack> items) {
+		for(ItemStack is : items) {
+			p.getInventory().addItem(is);
 		}
 	}
 }
