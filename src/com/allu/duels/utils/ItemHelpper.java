@@ -41,7 +41,7 @@ public class ItemHelpper {
 	}
 	
 	public static ItemStack getSkull(String skinURL, String name, String... lore) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
+        ItemStack head = new ItemStack(Material.SKULL, 1);
         if(skinURL.isEmpty()) {
         	return head;
         }

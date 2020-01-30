@@ -67,6 +67,7 @@ public class Lobby {
 	public void teleportToSpawn(Player p) {
 		p.teleport(spawnLocation);
 		p.setGameMode(GameMode.ADVENTURE);
+		p.setHealth(20);
 		menuHandler.setLobbyItems(p);
 	}
 	

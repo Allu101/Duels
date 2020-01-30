@@ -9,9 +9,9 @@ password: ""
 #lobby spwanlocation
 lobbyworldname: lobby
 spawnloc:
-  x: -5.5
+  x: 5.5
   y: 11
-  z: 15.5
+  z: -15.5
   yaw: 180
 
 firstarenacenter: 

@@ -1,6 +1,7 @@
 package com.allu.duels.utils;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.event.Event;
@@ -13,7 +14,7 @@ public final class ChallengeCreatedEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	
 	private DuelsPlayer duelsPlayer;
-	private List<DuelsPlayer> players;
+	private List<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	
 	private Kit kit;
 	
@@ -26,6 +27,7 @@ public final class ChallengeCreatedEvent extends Event {
 	public ChallengeCreatedEvent(DuelsPlayer challenger, DuelsPlayer opponent, Kit kit) {
 		this.duelsPlayer = challenger;
 		this.players.add(challenger);
+		this.players.add(opponent);
 		this.kit = kit;
 	}
 	

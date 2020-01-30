@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -29,12 +30,13 @@ public class DuelsGame implements CountDownTimerListener {
 	private Lobby lobby;
 	private MessageHandler messages;
 	
-	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode) {
+	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages) {
 		this.lobby = lobby;
-		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -30);
-		this.spawn2 = arenaCenterLoc.clone().add(0, 0, 30);
+		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
+		this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
 		this.gameMode = gameMode;
 		this.timer = new CountDownTimer(this);
+		this.messages = messages;
 	}
 	
 	public void leaveGame(DuelsPlayer dp) {
@@ -48,7 +50,7 @@ public class DuelsGame implements CountDownTimerListener {
 			Player p = dp.getPlayer();
 			dp.setGameWhereJoined(this);
 			timer.addPlayer(p);
-			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0f);
+			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 			getSpawn(p);
 			setKitItems(p, kit.getItems());
 		}
@@ -59,9 +61,9 @@ public class DuelsGame implements CountDownTimerListener {
 	public void onCountDownFinish() {
 		if(currentGameState == GameState.STARTING) {
 			currentGameState = GameState.PLAYING;
-			for (DuelsPlayer dp : players) {
+			for(DuelsPlayer dp : players) {
 				Player p = dp.getPlayer();
-				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 0f);
+				p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 				p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
 			}
 		}
@@ -80,6 +82,7 @@ public class DuelsGame implements CountDownTimerListener {
 		currentGameState = GameState.GAME_FINISH;
 		for(DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
+			p.setGameMode(GameMode.SPECTATOR);
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage(messages.getCenteredMessage(""));
 			p.sendMessage(messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getName()));

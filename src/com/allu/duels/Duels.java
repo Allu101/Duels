@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
+import com.allu.minigameapi.MessageHandler;
 
 public class Duels extends JavaPlugin implements Listener {
 	
@@ -26,8 +28,9 @@ public class Duels extends JavaPlugin implements Listener {
 	private ArrayList<Kit> kits = new ArrayList<>();
 	
 	private Events events;
-	private MenuHandler menuHandler;
 	private Lobby lobby;
+	private MenuHandler menuHandler;
+	private MessageHandler messages = new MessageHandler();
 	
 	@Override
     public void onEnable() {
@@ -36,7 +39,6 @@ public class Duels extends JavaPlugin implements Listener {
 		config.options().copyDefaults(true);
 	    saveConfig();
 	    
-	    loadKitsFromConfig();
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
 		menuHandler = new MenuHandler(this);
@@ -46,6 +48,7 @@ public class Duels extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(events, this);
 		this.getCommand("duel").setExecutor(events);
 		
+	    loadKitsFromConfig();
 		createGames(Gamemode.DUELS_1V1);
 		createGames(Gamemode.DUELS_2V2);
 //		createGames(Gamemode.DUELS_4V4);
@@ -70,17 +73,14 @@ public class Duels extends JavaPlugin implements Listener {
 		for (int i = 0; i < available_games; i++) {
 			String gameWorld = "gameworld_" + gameMode.getString();
 		    createWorldIfDoesntExist(gameWorld);
-			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode));
+			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, messages));
 		}
 	}
 	
 	private void createWorldIfDoesntExist(String worldName) {
     	List<World> worlds = Bukkit.getWorlds();
     	for(World w : worlds) {
-    		System.out.println(w.getName());
     		if (w.getName() == worldName) {
-    			w.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-    			w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
     			return;
     		}
     	}
@@ -90,9 +90,9 @@ public class Duels extends JavaPlugin implements Listener {
 	
 	private Location getArenaCenterLoc(int orderNumber, String world) {
 		String path = "firstarenacenter.";
-		int x = config.getInt(path + "x") * orderNumber;
-		int y = config.getInt(path + "y");
-		int z = config.getInt(path + "z");
+		double x = config.getDouble(path + "x") * orderNumber;
+		double y = config.getDouble(path + "y");
+		double z = config.getDouble(path + "z");
 		int yaw = config.getInt(path + "yaw");
 		return new Location(Bukkit.getWorld(world), x + 0.5, y, z + 0.5, yaw, 0);
 	}
@@ -104,7 +104,9 @@ public class Duels extends JavaPlugin implements Listener {
 			for(String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
 				kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(kitPath + "." + item)));
 			}
-			Kit kit = new Kit(new ItemStack(Material.getMaterial(config.getString(kitPath + ".menuitem"))), kitItems, key);
+			ItemStack kitMenuItem = menuHandler.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), key + " Duel"
+					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
+			Kit kit = new Kit(kitMenuItem, kitItems, key);
 			kits.add(kit);
 			kitItems.clear();
 		}

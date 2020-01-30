@@ -12,12 +12,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -69,8 +71,8 @@ public class Events implements Listener, CommandExecutor {
 				return true;
 			}
 			
-			if(args[0].equalsIgnoreCase("accept")) {
-				if(args.length > 1) {
+			if(args.length == 2) {
+				if(args[0].equalsIgnoreCase("accept")) {
 					Player player = Bukkit.getPlayerExact(args[1]);
 					if(player == null) {
 						p.sendMessage("Tämän nimistä pelaajaa ei löydy.");
@@ -87,10 +89,13 @@ public class Events implements Listener, CommandExecutor {
 						}
 					}
 					p.sendMessage(ChatColor.GRAY + "Kukaan ei ole lähettänyt sinulle duels pyyntöä.");
-				} else {
-					p.sendMessage(ChatColor.RED + "Hyväksy pyyntö /duels accept <pelaajan_nimi> tai klikkaamalla tästä.");
+					return true;
 				}
 			}
+			p.sendMessage(lobby.LINE);
+			p.sendMessage(ChatColor.AQUA + "/duel <pelaajan_nimi>");
+			p.sendMessage(ChatColor.AQUA + "/duel accept <pelaajan_nimi> tai klikkaamalla tästä.");
+			p.sendMessage(lobby.LINE);
 			return true;
 		}
 		return false;
@@ -124,12 +129,22 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
 	public void onChallengeCreated(ChallengeCreatedEvent e) {
 		challenges.add(e);
-		DuelsPlayer duelsPlayer = e.getDuelsPlayer();
-		for(DuelsPlayer dp : e.getDuelsPlayers()) {
-			Player p = dp.getPlayer();
-			duelsPlayer.getPlayer().sendMessage(ChatColor.AQUA + "Haastoit pelaajan" + p.getName() + "1v1 duelsiin");
-			p.sendMessage(ChatColor.GREEN + p.getName() + " haastoi sinut Duelsiin.");
-			p.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla" + ChatColor.BLUE + "/duels accept" + p.getName() + ".");
+		Player challenger = e.getDuelsPlayer().getPlayer();
+		for(DuelsPlayer opponentDp : e.getDuelsPlayers()) {
+			if(!opponentDp.getPlayer().equals(challenger)) {
+				Player opponent = opponentDp.getPlayer();
+				challenger.sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + opponent.getName() + " 1v1 duelsiin");
+				opponent.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut Duelsiin.");
+				opponent.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla " + ChatColor.BLUE + "/duel accept " + challenger.getName() + ".");
+			}	
+		}
+	}
+	
+	@EventHandler
+	public void creatureSpawn(CreatureSpawnEvent e) {
+		e.setCancelled(true);
+		if(!e.getEntityType().equals(EntityType.ARMOR_STAND)) {
+			e.setCancelled(true);
 		}
 	}
 	
