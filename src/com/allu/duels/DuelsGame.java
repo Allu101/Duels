@@ -114,13 +114,6 @@ public class DuelsGame implements CountDownTimerListener {
 		
 	}
 	
-	private boolean gameCanBeStart() {
-		if(players.size() == gameMode.getTeamSize()) {
-			return true;
-		}
-		return false;
-	}
-	
 	private void getSpawn(Player p) {
 		for(int i = 0; i < players.size(); i++) {
 			if(players.size() % 2 == 0) {

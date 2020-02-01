@@ -14,17 +14,19 @@ public final class ChallengeCreatedEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
 	
 	private DuelsPlayer challengerDp;
+	private DuelsPlayer opponent;
 	private List<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	
 	private Kit kit;
 	
 	public ChallengeCreatedEvent(DuelsPlayer challenger, DuelsPlayer opponent, Kit kit) {
 		this.challengerDp = challenger;
+		this.opponent = opponent;
 		this.players.add(challenger);
 		this.players.add(opponent);
 		this.kit = kit;
 	}
-	
+
 	public Kit getKit() {
 		return kit;
 	}
@@ -35,6 +37,10 @@ public final class ChallengeCreatedEvent extends Event {
 	
 	public List<DuelsPlayer> getDuelsPlayers() {
 		return players;
+	}
+	
+	public DuelsPlayer getOpponent() {
+		return opponent;
 	}
 	
 	public HandlerList getHandlers() {

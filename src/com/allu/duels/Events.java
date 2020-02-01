@@ -58,14 +58,18 @@ public class Events implements Listener, CommandExecutor {
 					p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
 					return true;
 				}
+				DuelsPlayer opponentDp = lobby.getDuelsPlayer(opponent);
 				String opponentName = opponent.getName();
+				if(opponentDp.getGameWhereJoined() != null) {
+					p.sendMessage(ChatColor.RED + "Et voi haastaa pelaajaa " + opponentName + ", koska hänellä on peli menossa.");
+				}
 				if(args[0].equalsIgnoreCase(opponentName)) {
 					if(p.getName().equals(opponentName)) {
 						p.sendMessage(ChatColor.RED + "Et voi haastaa itseasi duelsiin.");
 						return true;
 					}
 					p.openInventory(menuHandler.createKitMenu());
-					dp.setChallengedPlayer(lobby.getDuelsPlayer(opponent));
+					dp.setChallengedPlayer(opponentDp);
 				}
 				return true;
 			}
@@ -82,12 +86,16 @@ public class Events implements Listener, CommandExecutor {
 						return true;
 					}
 					for(ChallengeCreatedEvent e : new ArrayList<ChallengeCreatedEvent>(challenges)) {
-						if(e.getChallengerDp().getPlayer().equals(player) && e.getDuelsPlayers().contains(dp)) {
+						List<DuelsPlayer> challengePlayers = e.getDuelsPlayers();
+						if(e.getChallengerDp().getPlayer().equals(player) && challengePlayers.contains(dp)) {
 							DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
 							if(game != null) {
-								game.startGame(e.getDuelsPlayers(), e.getKit());
+								game.startGame(challengePlayers, e.getKit());
 								challenges.remove(e);
+								removeChallenges(challengePlayers);
 								return true;
+							} else {
+								p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
 							}
 						}
 					}
@@ -102,6 +110,16 @@ public class Events implements Listener, CommandExecutor {
 			return true;
 		}
 		return false;
+	}
+	
+	private void removeChallenges(List<DuelsPlayer> duelsPlayers) {
+		for(DuelsPlayer dp : duelsPlayers) {
+			for(ChallengeCreatedEvent e : new ArrayList<ChallengeCreatedEvent>(challenges)) {
+				if(e.getDuelsPlayers().contains(dp)) {
+					challenges.remove(e);
+				}
+			}
+		}
 	}
 	
 	@EventHandler
