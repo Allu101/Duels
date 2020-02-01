@@ -1,7 +1,5 @@
 package com.allu.duels;
 
-import java.util.Arrays;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -9,33 +7,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.allu.duels.utils.ChallengeCreatedEvent;
 import com.allu.duels.utils.Kit;
+import com.allu.minigameapi.ItemHelpper;
 
 public class MenuHandler {
 	
 	private ItemStack queue_join_item;
 	
 	private Duels duels;
+	private ItemHelpper itemHelpper;
 
 	public MenuHandler(Duels duels) {
 		this.duels = duels;
-		queue_join_item = createItemWithTitle(Material.IRON_SWORD, "Liity 2v2 jonoon");
-	}
-	
-	public ItemStack createItemWithTitle(Material itemType, String title, String... lore) {
-		ItemStack is = new ItemStack(itemType, 1);
-		ItemMeta meta = is.getItemMeta();
-		meta.setDisplayName(title);
-		
-		if (lore.length > 0) {
-			meta.setLore(Arrays.asList(lore));
-		}
-		
-		is.setItemMeta(meta);
-		return is;
+		itemHelpper = new ItemHelpper();
+		queue_join_item = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "Liity 2v2 jonoon");
 	}
 	
 	public void inventoryClickHandler(DuelsPlayer dp, ItemStack is) {

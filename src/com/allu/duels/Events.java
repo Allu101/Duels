@@ -31,7 +31,6 @@ import org.bukkit.inventory.ItemStack;
 import com.allu.duels.utils.ChallengeCreatedEvent;
 import com.allu.duels.utils.Gamemode;
 
-
 public class Events implements Listener, CommandExecutor {
 	
 	private List<ChallengeCreatedEvent> challenges = new ArrayList<ChallengeCreatedEvent>();
@@ -75,11 +74,15 @@ public class Events implements Listener, CommandExecutor {
 				if(args[0].equalsIgnoreCase("accept")) {
 					Player player = Bukkit.getPlayerExact(args[1]);
 					if(player == null) {
-						p.sendMessage("Tämän nimistä pelaajaa ei löydy.");
+						p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
+						return true;
+					}
+					if(p.equals(player)) {
+						p.sendMessage(ChatColor.RED + "Et voi hyväksyä omaa haastettasi.");
 						return true;
 					}
 					for(ChallengeCreatedEvent e : new ArrayList<ChallengeCreatedEvent>(challenges)) {
-						if(e.getDuelsPlayer().getPlayer().equals(player) && e.getDuelsPlayers().contains(dp)) {
+						if(e.getChallengerDp().getPlayer().equals(player) && e.getDuelsPlayers().contains(dp)) {
 							DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
 							if(game != null) {
 								game.startGame(e.getDuelsPlayers(), e.getKit());
@@ -129,7 +132,7 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
 	public void onChallengeCreated(ChallengeCreatedEvent e) {
 		challenges.add(e);
-		Player challenger = e.getDuelsPlayer().getPlayer();
+		Player challenger = e.getChallengerDp().getPlayer();
 		for(DuelsPlayer opponentDp : e.getDuelsPlayers()) {
 			if(!opponentDp.getPlayer().equals(challenger)) {
 				Player opponent = opponentDp.getPlayer();

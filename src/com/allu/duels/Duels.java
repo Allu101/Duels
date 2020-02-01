@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
+import com.allu.minigameapi.ItemHelpper;
 import com.allu.minigameapi.MessageHandler;
 
 public class Duels extends JavaPlugin implements Listener {
@@ -28,6 +28,7 @@ public class Duels extends JavaPlugin implements Listener {
 	private ArrayList<Kit> kits = new ArrayList<>();
 	
 	private Events events;
+	private ItemHelpper itemHelpper = new ItemHelpper();
 	private Lobby lobby;
 	private MenuHandler menuHandler;
 	private MessageHandler messages = new MessageHandler();
@@ -50,7 +51,7 @@ public class Duels extends JavaPlugin implements Listener {
 		
 	    loadKitsFromConfig();
 		createGames(Gamemode.DUELS_1V1);
-		createGames(Gamemode.DUELS_2V2);
+//		createGames(Gamemode.DUELS_2V2);
 //		createGames(Gamemode.DUELS_4V4);
 	}
 	
@@ -79,7 +80,7 @@ public class Duels extends JavaPlugin implements Listener {
 	
 	private void createWorldIfDoesntExist(String worldName) {
     	List<World> worlds = Bukkit.getWorlds();
-    	for(World w : worlds) {
+    	for (World w : worlds) {
     		if (w.getName() == worldName) {
     			return;
     		}
@@ -99,12 +100,12 @@ public class Duels extends JavaPlugin implements Listener {
 	
 	private void loadKitsFromConfig() {
 		List<ItemStack> kitItems = new ArrayList<>();
-		for(String key : config.getConfigurationSection("kits").getKeys(false)) {
+		for (String key : config.getConfigurationSection("kits").getKeys(false)) {
 			String kitPath = "kits." + key;
-			for(String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
+			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
 				kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(kitPath + "." + item)));
 			}
-			ItemStack kitMenuItem = menuHandler.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), key + " Duel"
+			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), key + " Duel"
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
 			Kit kit = new Kit(kitMenuItem, kitItems, key);
 			kits.add(kit);
