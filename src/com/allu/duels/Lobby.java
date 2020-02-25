@@ -55,9 +55,11 @@ public class Lobby {
 	}
 	
 	public void onPlayerJoin(Player p) {
-		DuelsPlayer dp = new DuelsPlayer(p);
+		DuelsPlayer dp = new DuelsPlayer(p, new PlayerSidebarHandler());
 		players.add(dp);
 		teleportToSpawn(p);
+		p.setScoreboard(dp.getSidebarHandler().getLobbyBoard());
+		dp.getSidebarHandler().updateLobbySidebar();
 	}
 	
 	public void onPlayerLeave(DuelsPlayer dp) {	

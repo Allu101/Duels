@@ -105,7 +105,7 @@ public class Events implements Listener, CommandExecutor {
 			}
 			p.sendMessage(lobby.LINE);
 			p.sendMessage(ChatColor.AQUA + "/duel <pelaajan_nimi>");
-			p.sendMessage(ChatColor.AQUA + "/duel accept <pelaajan_nimi> tai klikkaamalla tästä.");
+			p.sendMessage(ChatColor.AQUA + "/duel accept <pelaajan_nimi>.");
 			p.sendMessage(lobby.LINE);
 			return true;
 		}

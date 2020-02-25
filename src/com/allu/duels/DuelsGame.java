@@ -54,6 +54,8 @@ public class DuelsGame implements CountDownTimerListener {
 			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 			getSpawn(p);
 			setKitItems(p, kit.getItems());
+			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
+			dp.getSidebarHandler().updateGameSidebar();
 		}
 		timer.start(5, "Duelsin alkuun");
 	}
@@ -72,6 +74,8 @@ public class DuelsGame implements CountDownTimerListener {
 			for(DuelsPlayer dp : players) {
 				lobby.teleportToSpawn(dp.getPlayer());
 				dp.setGameWhereJoined(null);
+				dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
+				dp.getSidebarHandler().updateLobbySidebar();
 			}
 			timer.clearPlayers();
 			players.clear();
