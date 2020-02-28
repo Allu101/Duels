@@ -6,7 +6,7 @@ public class DuelsPlayer {
 	
 	private Player player;
 	private DuelsPlayer challengedPlayer;
-	private DuelsGame gameWhereJoined;
+	private DuelsGame gameWhereJoined = null;
 	private PlayerSidebarHandler sidebarHandler;
 	
 	private int bestWinStreak;

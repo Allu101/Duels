@@ -31,7 +31,6 @@ public class Duels extends JavaPlugin implements Listener {
 	private ItemHelpper itemHelpper = new ItemHelpper();
 	private Lobby lobby;
 	private MenuHandler menuHandler;
-	private MessageHandler messages = new MessageHandler();
 	
 	@Override
     public void onEnable() {
@@ -42,7 +41,7 @@ public class Duels extends JavaPlugin implements Listener {
 	    
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
-		menuHandler = new MenuHandler(this);
+		menuHandler = new MenuHandler(this, itemHelpper);
 		lobby = new Lobby(config, menuHandler);
 		events = new Events(lobby, menuHandler);
 		
@@ -74,7 +73,7 @@ public class Duels extends JavaPlugin implements Listener {
 		for (int i = 0; i < available_games; i++) {
 			String gameWorld = "gameworld_" + gameMode.getString();
 		    createWorldIfDoesntExist(gameWorld);
-			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, messages));
+			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, new MessageHandler()));
 		}
 	}
 	

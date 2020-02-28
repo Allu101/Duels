@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -223,6 +224,11 @@ public class Events implements Listener, CommandExecutor {
 		if(e.getPlayer() != null) {
 			e.setCancelled(true);
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent e) {
+		menuHandler.onPlayerInteract(e.getPlayer().getInventory().getItemInHand(), e.getAction());
 	}
 	
 	@EventHandler

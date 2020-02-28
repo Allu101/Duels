@@ -26,9 +26,9 @@ public class DuelsGame implements CountDownTimerListener {
 	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	private Location spawn1, spawn2;
 	
-	private CountDownTimer timer;
 	private Lobby lobby;
 	private MessageHandler messages;
+	private CountDownTimer timer;
 	
 	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages) {
 		this.lobby = lobby;
@@ -40,24 +40,9 @@ public class DuelsGame implements CountDownTimerListener {
 		this.messages = messages;
 	}
 	
-	public void leaveGame(DuelsPlayer dp) {
-		players.remove(dp);
-	}
-	
-	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
-		currentGameState = GameState.STARTING;
-		for(DuelsPlayer dp : dplayers) {
-			players.add(dp);
-			Player p = dp.getPlayer();
-			dp.setGameWhereJoined(this);
-			timer.addPlayer(p);
-			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
-			getSpawn(p);
-			setKitItems(p, kit.getItems());
-			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
-			dp.getSidebarHandler().updateGameSidebar();
-		}
-		timer.start(5, "Duelsin alkuun");
+	@Override
+	public void onCountDownChange(int time) {
+		
 	}
 	
 	@Override
@@ -89,20 +74,20 @@ public class DuelsGame implements CountDownTimerListener {
 			Player p = dp.getPlayer();
 			p.setGameMode(GameMode.SPECTATOR);
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
-			p.sendMessage(messages.getCenteredMessage(""));
+			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getName()));
-			p.sendMessage(messages.getCenteredMessage(""));
+			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 		}
 		timer.start(5, "");
 	}
 	
-	public ArrayList<Location> getPlacedBlocks() {
-		return buildedBlocks;
-	}
-	
 	public Gamemode getGamemode() {
 		return gameMode;
+	}
+	
+	public ArrayList<Location> getPlacedBlocks() {
+		return buildedBlocks;
 	}
 	
 	public boolean isFree() {
@@ -113,14 +98,29 @@ public class DuelsGame implements CountDownTimerListener {
 		return currentGameState == GameState.PLAYING;
 	}
 	
-	@Override
-	public void onCountDownChange(int time) {
-		
+	public void leaveGame(DuelsPlayer dp) {
+		players.remove(dp);
+	}
+	
+	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
+		currentGameState = GameState.STARTING;
+		for(DuelsPlayer dp : dplayers) {
+			players.add(dp);
+			Player p = dp.getPlayer();
+			dp.setGameWhereJoined(this);
+			timer.addPlayer(p);
+			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
+			getSpawn(p);
+			setKitItems(p, kit.getItems());
+			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
+			dp.getSidebarHandler().updateGameSidebar();
+		}
+		timer.start(5, "Duelsin alkuun");
 	}
 	
 	private void getSpawn(Player p) {
 		for(int i = 0; i < players.size(); i++) {
-			if(players.size() % 2 == 0) {
+			if(i % 2 == 0) {
 				p.teleport(spawn1);
 			} else {
 				p.teleport(spawn2);

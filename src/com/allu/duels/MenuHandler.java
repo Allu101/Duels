@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -19,24 +20,10 @@ public class MenuHandler {
 	private Duels duels;
 	private ItemHelpper itemHelpper;
 
-	public MenuHandler(Duels duels) {
+	public MenuHandler(Duels duels, ItemHelpper itemHelper) {
 		this.duels = duels;
-		itemHelpper = new ItemHelpper();
-		queue_join_item = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "Liity 2v2 jonoon");
-	}
-	
-	public void inventoryClickHandler(DuelsPlayer dp, ItemStack is) {
-		if(is.equals(queue_join_item)) {
-			dp.getPlayer().sendMessage("T‰st‰ ei viel‰ tapahdu mit‰‰n. :p");
-			return;
-		}
-		for(Kit kit : duels.getKits()) {
-			if(is.equals(kit.getMenuItem())) {
-				ChallengeCreatedEvent event = new ChallengeCreatedEvent(dp, dp.getChallengedPlayer(), kit);
-				Bukkit.getServer().getPluginManager().callEvent(event);
-				dp.getPlayer().closeInventory();
-			}
-		}
+		this.itemHelpper = itemHelper;
+		queue_join_item = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "Liity 1v1 jonoon");
 	}
 	
 	public Inventory createKitMenu() {
@@ -50,6 +37,23 @@ public class MenuHandler {
 			i++;
 		}
 		return inv;
+	}
+	
+	public void inventoryClickHandler(DuelsPlayer dp, ItemStack is) {
+		for(Kit kit : duels.getKits()) {
+			if(is.equals(kit.getMenuItem())) {
+				ChallengeCreatedEvent event = new ChallengeCreatedEvent(dp, dp.getChallengedPlayer(), kit);
+				Bukkit.getServer().getPluginManager().callEvent(event);
+				dp.getPlayer().closeInventory();
+			}
+		}
+	}
+	
+	public void onPlayerInteract(ItemStack itemInHand, Action action) {
+		if (itemInHand.equals(queue_join_item) && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+			
+		}
+		
 	}
 	
 	public void setLobbyItems(Player p) {
