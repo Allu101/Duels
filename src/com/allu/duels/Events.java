@@ -23,6 +23,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -173,6 +174,12 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent e) {
 		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
+		if (!e.getPlayer().isOp())
+			e.setCancelled(true);
 	}
 	
 	@EventHandler
