@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +18,7 @@ import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.ItemHelpper;
 import com.allu.minigameapi.MessageHandler;
 
-public class Duels extends JavaPlugin implements Listener {
+public class Duels extends JavaPlugin {
 	
 	public static Duels plugin;
 	
