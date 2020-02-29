@@ -3,8 +3,10 @@
 # -------------------------------------------
   
 #database
-username: ""
-password: ""
+database:
+  url: ''
+  username: ''
+  password: ''
 
 #lobby spwanlocation
 lobbyworldname: lobby

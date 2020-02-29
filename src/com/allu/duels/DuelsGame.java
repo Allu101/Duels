@@ -6,18 +6,17 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
 import com.allu.minigameapi.CountDownTimerListener;
 import com.allu.minigameapi.MessageHandler;
+import com.allu.minigameapi.ranking.SimpleRanking;
 
 public class DuelsGame implements CountDownTimerListener {
 
@@ -38,8 +37,10 @@ public class DuelsGame implements CountDownTimerListener {
 	
 	private int arenaXWidth = 50;
 	private int arenaZWidth = 80;
+	
+	private SimpleRanking winsRanking;
 
-	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages) {
+	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages, SimpleRanking winsRanking) {
 		this.lobby = lobby;
 		this.arenaCenterLoc = arenaCenterLoc;
 		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
@@ -48,6 +49,7 @@ public class DuelsGame implements CountDownTimerListener {
 		this.gameMode = gameMode;
 		this.timer = new CountDownTimer(this);
 		this.messages = messages;
+		this.winsRanking = winsRanking;
 	}
 
 	@Override
@@ -69,8 +71,11 @@ public class DuelsGame implements CountDownTimerListener {
 				dp.setGameWhereJoined(null);
 				clearPlayerInventoryAndEquipment(dp.getPlayer());
 				lobby.teleportToSpawn(dp.getPlayer());
+				
+				dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
+						dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
+				
 				dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
-				dp.getSidebarHandler().updateLobbySidebar();
 			}
 			timer.clearPlayers();
 			players.clear();
@@ -93,7 +98,9 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void gameEnd(DuelsPlayer winner) {
+		
 		currentGameState = GameState.GAME_FINISH;
+		
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
 			
@@ -103,13 +110,23 @@ public class DuelsGame implements CountDownTimerListener {
 					messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getPlayer().getName()));
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
+			
+			if (dp.equals(winner)) {
+				dp.addWin();
+			} else {
+				dp.addLose();
+			}
+			
+			Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
 		}
 		
-		winner.addWin();
+		winsRanking.updateRankingWithPlayers(Duels.plugin.dbHandler.loadTop10PlayersToWinsScoreboard());
 		
 		timer.start(5, "");
 	}
 
+	
+	
 	public Gamemode getGamemode() {
 		return gameMode;
 	}
@@ -147,7 +164,7 @@ public class DuelsGame implements CountDownTimerListener {
 			getSpawn(p);
 			setKitItems(p, kit.getItems());
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
-			dp.getSidebarHandler().updateGameSidebar();
+			dp.getSidebarHandler().updateGameSidebar("1 vs 1");
 		}
 		timer.start(5, "Duelsin alkuun");
 	}

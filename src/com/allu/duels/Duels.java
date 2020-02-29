@@ -13,14 +13,20 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.allu.duels.utils.DatabaseHandler;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.ItemHelpper;
 import com.allu.minigameapi.MessageHandler;
+import com.allu.minigameapi.ranking.SimpleRanking;
 
 public class Duels extends JavaPlugin {
 	
 	public static Duels plugin;
+	
+	public DatabaseHandler dbHandler = new DatabaseHandler(this);
+	
+	
 	
 	private static String LOBBY_WORLD;
 	private FileConfiguration config = this.getConfig();
@@ -31,12 +37,20 @@ public class Duels extends JavaPlugin {
 	private Lobby lobby;
 	private MenuHandler menuHandler;
 	
+	private SimpleRanking winsRanking;
+	
+
+	
+	
+	
 	@Override
     public void onEnable() {
 		plugin = this;
 		this.saveDefaultConfig();
 		config.options().copyDefaults(true);
 	    saveConfig();
+	    
+	    winsRanking = new SimpleRanking(dbHandler.loadTop10PlayersToWinsScoreboard());
 	    
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
@@ -51,6 +65,10 @@ public class Duels extends JavaPlugin {
 		createGames(Gamemode.DUELS_1V1);
 //		createGames(Gamemode.DUELS_2V2);
 //		createGames(Gamemode.DUELS_4V4);
+		
+		World world = Bukkit.getWorld(LOBBY_WORLD);
+		winsRanking.addFloatingRankingList(new Location(world, 5.5, 12, -37.5),
+				"" + ChatColor.BLUE + ChatColor.BOLD + "- Voitot -", ChatColor.BLUE, ChatColor.GREEN);	
 	}
 	
 	@Override
@@ -72,7 +90,7 @@ public class Duels extends JavaPlugin {
 		for (int i = 0; i < available_games; i++) {
 			String gameWorld = "gameworld_" + gameMode.getString();
 		    createWorldIfDoesntExist(gameWorld);
-			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, new MessageHandler()));
+			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, new MessageHandler(), this.winsRanking));
 		}
 	}
 	

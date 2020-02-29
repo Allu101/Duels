@@ -8,9 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
 import com.allu.duels.utils.Gamemode;
-
 import net.md_5.bungee.api.ChatColor;
 
 public class Lobby {
@@ -57,10 +55,12 @@ public class Lobby {
 	
 	public void onPlayerJoin(Player p) {
 		DuelsPlayer dp = new DuelsPlayer(p, new PlayerSidebarHandler());
+		Duels.plugin.dbHandler.loadStatsSQL(dp);
 		players.add(dp);
 		teleportToSpawn(p);
 		p.setScoreboard(dp.getSidebarHandler().getLobbyBoard());
-		dp.getSidebarHandler().updateLobbySidebar();
+		dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
+				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
 	}
 	
 	public void onPlayerLeave(DuelsPlayer dp) {	

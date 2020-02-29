@@ -21,12 +21,20 @@ public class DuelsPlayer {
 	
 	private void addCurrentWinStreak() {
 		currentWinStreak++;
+		if (currentWinStreak > bestWinStreak)
+			bestWinStreak = currentWinStreak;
 	}
 	
 	public void addWin() {
 		wins++;
+		playedGames++;
 		addCurrentWinStreak();
 	}
+	public void addLose() {
+		this.currentWinStreak = 0;
+		playedGames++;
+	}
+	
 	
 	public int getBestWinStreak() {
 		return bestWinStreak;
@@ -60,6 +68,10 @@ public class DuelsPlayer {
 		return ((double)wins / loses);
 	}
 	
+	public int getPlayedGames() {
+		return this.playedGames;
+	}
+	
 	public int getWins() {
 		return wins;
 	}
@@ -68,9 +80,12 @@ public class DuelsPlayer {
 		return uuid.equals(player.getUniqueId().toString());
 	}
 	
-	public void saveGameStats() {
-		playedGames++;
-		resetGameStats();
+	public void setPlayedGames(int playedGames) {
+		this.playedGames = playedGames;
+	}
+	
+	public void setCurrentWinStreak(int currentWinStreak) {
+		this.currentWinStreak = currentWinStreak;
 	}
 	
 	public void setBestWinStreak(int bestWinStreak) {
@@ -87,10 +102,6 @@ public class DuelsPlayer {
 	
 	public void setWins(int wins) {
 		this.wins = wins;
-	}
-	
-	private void resetGameStats() {
-		sidebarHandler.resetGameSidebar();
 	}
 	
 }

@@ -9,23 +9,14 @@ import com.allu.minigameapi.player.SidebarHandler;
 
 public class PlayerSidebarHandler {
 	
-	private int wins;
-	private int bestWinStreak;
-	private int currentWinStreak;
-	private String bestWinStreak_row;
-	private String currentWinStreak_row;
 	private String header = ChatColor.BLUE + "" + ChatColor.BOLD + " Duels ";
-	private String duelsMode;
 	private String netAddress_row = ChatColor.GRAY + "www.slinkoncraft.net";
-	private String totalWins_row;
 	
-	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows());
-	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows());
+	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows(""));
+	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0));
 	
 	public PlayerSidebarHandler() {
-		this.duelsMode = "";
-		this.wins = 0;
-		gameSidebar.updateSidebar(getGameSidebarRows());
+		gameSidebar.updateSidebar(getGameSidebarRows(""));
 	}
 	
 	public Scoreboard getGameBoard() {
@@ -35,27 +26,16 @@ public class PlayerSidebarHandler {
 	public Scoreboard getLobbyBoard() {
 		return lobbySidebar.getBoard();
 	}
-	
-	public void resetGameSidebar() {
-		duelsMode = "";
-	}
 
-	public void updateGameSidebar() {
-		lobbySidebar.updateSidebar(getGameSidebarRows());
+	public void updateGameSidebar(String duelsMode) {
+		lobbySidebar.updateSidebar(getGameSidebarRows(duelsMode));
 	}
 	
-	public void updateLobbySidebar() {
-		lobbySidebar.updateSidebar(getLobbySidebarRows());
+	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames) {
+		lobbySidebar.updateSidebar(getLobbySidebarRows(wins, currentWinStreak, bestWinStreak, playedGames));
 	}
 	
-	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak) {
-		this.wins = wins;
-		this.currentWinStreak = currentWinStreak;
-		this.bestWinStreak = bestWinStreak;
-		lobbySidebar.updateSidebar(getLobbySidebarRows());
-	}
-	
-	private ArrayList<String> getGameSidebarRows() {
+	private ArrayList<String> getGameSidebarRows(String duelsMode) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
 		rows.add(ChatColor.WHITE + "Mode: " + ChatColor.GRAY + duelsMode);
@@ -64,17 +44,21 @@ public class PlayerSidebarHandler {
 		return rows;
 	}
 	
-	private ArrayList<String> getLobbySidebarRows() {
+	private ArrayList<String> getLobbySidebarRows(int wins, int currentWinStreak, int bestWinStreak, int playedGames) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
-		totalWins_row = ChatColor.GRAY + "Voittoja: " + ChatColor.GOLD + wins;
-		currentWinStreak_row = ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak;
-		bestWinStreak_row = ChatColor.GRAY + "Parhain voittoputki: " + ChatColor.GOLD + bestWinStreak;
+		String totalWins_row = ChatColor.GRAY + "Voittoja: " + ChatColor.GOLD + wins;
+		String currentWinStreak_row = ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak;
+		String bestWinStreak_row = ChatColor.GRAY + "Parhain voittoputki: " + ChatColor.GOLD + bestWinStreak;
+		String playedGamesRow = ChatColor.GRAY + "Pelatut pelit: " + ChatColor.GOLD + playedGames;
 		
+		rows.add("");
 		rows.add(totalWins_row);
 		rows.add("");
 		rows.add(currentWinStreak_row);
 		rows.add(bestWinStreak_row);
+		rows.add("");
+		rows.add(playedGamesRow);
 		rows.add("");
 		rows.add(netAddress_row);
 		return rows;
