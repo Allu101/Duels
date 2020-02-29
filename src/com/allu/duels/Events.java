@@ -191,7 +191,6 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void creatureSpawn(CreatureSpawnEvent e) {
-		e.setCancelled(true);
 		if(!e.getEntityType().equals(EntityType.ARMOR_STAND)) {
 			e.setCancelled(true);
 		}
