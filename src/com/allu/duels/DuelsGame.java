@@ -33,8 +33,8 @@ public class DuelsGame implements CountDownTimerListener {
 	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages) {
 		this.lobby = lobby;
 		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
-		spawn1.setYaw(-180);
 		this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
+		spawn2.setYaw(-180);
 		this.gameMode = gameMode;
 		this.timer = new CountDownTimer(this);
 		this.messages = messages;
