@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -32,6 +33,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.allu.duels.utils.ChallengeCreatedEvent;
 import com.allu.duels.utils.Gamemode;
+
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class Events implements Listener, CommandExecutor {
 	
@@ -158,7 +162,29 @@ public class Events implements Listener, CommandExecutor {
 				Player opponent = opponentDp.getPlayer();
 				challenger.sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + opponent.getName() + " 1v1 duelsiin");
 				opponent.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut Duelsiin.");
-				opponent.sendMessage(ChatColor.GREEN + "Hyväksy haaste komennolla " + ChatColor.BLUE + "/duel accept " + challenger.getName() + ".");
+				
+				String commandString = "/duel accept " + challenger.getName();
+				
+				TextComponent msg1 = new TextComponent("Hyväksy haaste ");
+				msg1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+				
+				TextComponent msg2 = new TextComponent("klikkaamalla");
+				msg2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
+				msg2.setColor(net.md_5.bungee.api.ChatColor.DARK_PURPLE);
+				msg2.setUnderlined(true);
+				
+				TextComponent msg3 = new TextComponent(" tai komennolla ");
+				msg3.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+				
+				TextComponent msg4 = new TextComponent(commandString + ".");
+				msg4.setColor(net.md_5.bungee.api.ChatColor.BLUE);
+				
+				msg1.addExtra(msg2);
+				msg1.addExtra(msg3);
+				msg1.addExtra(msg4);
+				
+				
+				opponent.spigot().sendMessage(msg1);
 			}	
 		}
 	}
@@ -201,9 +227,20 @@ public class Events implements Listener, CommandExecutor {
 		if(!(e.getEntity() instanceof Player)) {
 			return;
 		}
+
 		Player damaged = (Player) e.getEntity();
 		if(lobby.isLobbyWorld(damaged)) {
 			e.setCancelled(true);
+			
+			if(!(e.getDamager() instanceof Player)) {
+				return;
+			}
+			Player damager = (Player) e.getDamager();
+			
+			if (damager.getItemInHand().equals(menuHandler.getChallengeItem())) {
+				damager.performCommand("duel " + damaged.getName());
+			}
+			
 			return;
 		}
 		

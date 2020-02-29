@@ -15,7 +15,8 @@ import com.allu.minigameapi.ItemHelpper;
 
 public class MenuHandler {
 	
-	private ItemStack queue_join_item;
+	private ItemStack queueJoinItem;
+	private ItemStack challengeItem;
 	
 	private Duels duels;
 	private ItemHelpper itemHelpper;
@@ -23,7 +24,8 @@ public class MenuHandler {
 	public MenuHandler(Duels duels, ItemHelpper itemHelper) {
 		this.duels = duels;
 		this.itemHelpper = itemHelper;
-		queue_join_item = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "Liity 1v1 jonoon");
+		queueJoinItem = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "Liity 1v1 jonoon");
+		challengeItem = itemHelpper.createItemWithTitle(Material.WOOD_SWORD, "Haasta kaveri lyömällä!");
 	}
 	
 	public Inventory createKitMenu() {
@@ -50,7 +52,7 @@ public class MenuHandler {
 	}
 	
 	public void onPlayerInteract(ItemStack itemInHand, Action action) {
-		if (itemInHand.equals(queue_join_item) && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+		if (itemInHand.equals(queueJoinItem) && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
 			
 		}
 		
@@ -59,7 +61,12 @@ public class MenuHandler {
 	public void setLobbyItems(Player p) {
 		p.getInventory().clear();
 		PlayerInventory pInv = p.getInventory();
-		pInv.setItem(0, queue_join_item);
+		pInv.setItem(0, queueJoinItem);
+		pInv.setItem(1, challengeItem);
+	}
+	
+	public ItemStack getChallengeItem() {
+		return this.challengeItem;
 	}
 	
 }
