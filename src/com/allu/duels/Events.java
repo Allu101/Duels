@@ -203,6 +203,12 @@ public class Events implements Listener, CommandExecutor {
 	}
 	
 	@EventHandler
+    public void onEntityDamage(EntityDamageEvent e){
+        if (lobby.isLobbyWorld(e.getEntity()))
+        	e.setCancelled(true);
+    }
+	
+	@EventHandler
 	public void onArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
 		if (!e.getPlayer().isOp())
 			e.setCancelled(true);

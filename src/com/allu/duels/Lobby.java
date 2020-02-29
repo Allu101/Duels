@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.allu.duels.utils.Gamemode;
@@ -50,8 +51,8 @@ public class Lobby {
 		return null;
 	}
 	
-	public boolean isLobbyWorld(Player p) {
-		return p.getWorld().getName().equals(Duels.getLobbyWorldName());
+	public boolean isLobbyWorld(Entity e) {
+		return e.getWorld().getName().equals(Duels.getLobbyWorldName());
 	}
 	
 	public void onPlayerJoin(Player p) {
