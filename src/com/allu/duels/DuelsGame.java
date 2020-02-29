@@ -8,6 +8,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -75,7 +77,17 @@ public class DuelsGame implements CountDownTimerListener {
 		currentGameState = GameState.GAME_FINISH;
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
-			p.setGameMode(GameMode.SPECTATOR);
+			p.getInventory().clear();
+			p.getInventory().setHelmet(null);
+			p.getInventory().setChestplate(null);
+			p.getInventory().setLeggings(null);
+			p.getInventory().setBoots(null);
+			
+			if (!p.equals(winner)) {
+				p.setGameMode(GameMode.SPECTATOR);
+				p.getWorld().strikeLightningEffect(p.getLocation());
+			}
+			
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage("");
 			p.sendMessage(
@@ -83,6 +95,7 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 		}
+		
 		timer.start(5, "");
 	}
 
@@ -107,6 +120,12 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
+		
+		for (Entity entity : spawn1.getWorld().getEntities()) {
+			if (!entity.getType().equals(EntityType.ARMOR_STAND))
+				entity.remove();
+		}
+		
 		currentGameState = GameState.STARTING;
 		for (DuelsPlayer dp : dplayers) {
 			players.add(dp);

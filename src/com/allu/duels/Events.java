@@ -260,7 +260,7 @@ public class Events implements Listener, CommandExecutor {
 			return;
 		}
 		
-		if(damaged.getHealth() - e.getDamage() > 0) {
+		if(damaged.getHealth() - e.getFinalDamage() > 0) {
 			return;
 		}
 		// Player would be dead at this point, so cancel and do other stuff --->
