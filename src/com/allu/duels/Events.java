@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.allu.duels.utils.ChallengeCreatedEvent;
@@ -201,11 +202,6 @@ public class Events implements Listener, CommandExecutor {
 		e.setCancelled(true);
 	}
 	
-	@EventHandler
-    public void onEntityDamage(EntityDamageEvent e){
-        if (lobby.isLobbyWorld(e.getEntity()))
-        	e.setCancelled(true);
-    }
 	
 	@EventHandler
 	public void onArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
@@ -228,6 +224,43 @@ public class Events implements Listener, CommandExecutor {
 	}
 	
 	@EventHandler
+    public void onEntityDamage(EntityDamageEvent e){
+		
+        if (lobby.isLobbyWorld(e.getEntity()))
+        	e.setCancelled(true);
+        
+        if(!(e.getEntity() instanceof Player)) {
+			return;
+		}
+
+		Player damaged = (Player) e.getEntity();	
+		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(damaged).getGameWhereJoined();
+		
+		if(gameWhereJoined == null) {
+			return;
+		}
+		
+		if(!gameWhereJoined.isGameOn()) {
+			e.setCancelled(true);
+			return;
+		}
+		
+		// Checks if player is under arena. The player is announced as being dead.
+		if (gameWhereJoined.isUnderArena(damaged.getLocation())) {
+			e.setCancelled(true);
+			gameWhereJoined.onPlayerDie(damaged);
+		}
+		
+		if(damaged.getHealth() - e.getFinalDamage() > 0) {
+			return;
+		}
+		// Player would be dead at this point, so cancel and do other stuff --->
+		e.setCancelled(true);
+		gameWhereJoined.onPlayerDie(damaged);
+        
+    }
+	
+	@EventHandler
 	public void onPlayerDamage(EntityDamageByEntityEvent e) {
 		if(!(e.getEntity() instanceof Player)) {
 			return;
@@ -248,25 +281,10 @@ public class Events implements Listener, CommandExecutor {
 			
 			return;
 		}
-		
-		Player damager = getDamager(e);		
-		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(damaged).getGameWhereJoined();
-		if(damager == null || gameWhereJoined == null) {
-			return;
-		}
-		
-		if(!gameWhereJoined.isGameOn()) {
-			e.setCancelled(true);
-			return;
-		}
-		
-		if(damaged.getHealth() - e.getFinalDamage() > 0) {
-			return;
-		}
-		// Player would be dead at this point, so cancel and do other stuff --->
-		e.setCancelled(true);
-		gameWhereJoined.gameEnd(damager);
 	}
+	
+	
+	
 	
 	@EventHandler
 	public void onPlayerDrop(PlayerDropItemEvent e) {
@@ -296,6 +314,21 @@ public class Events implements Listener, CommandExecutor {
 		}
 		lobby.onPlayerLeave(dp);
 	}
+	
+	@EventHandler
+	public void onPlayerTeleport(PlayerTeleportEvent e) {
+		
+		Player p = e.getPlayer();
+		
+		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
+		
+		if (gameWhereJoined != null && !gameWhereJoined.isWithinArena(e.getTo())) {
+			e.setCancelled(true);
+			p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
+		}
+	}
+	
+	
 	
 	private Player getDamager(EntityDamageByEntityEvent e) {
 		Entity damager = e.getDamager();

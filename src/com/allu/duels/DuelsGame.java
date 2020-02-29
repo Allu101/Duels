@@ -30,14 +30,18 @@ public class DuelsGame implements CountDownTimerListener {
 
 	private ArrayList<Location> buildedBlocks = new ArrayList<Location>();
 	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
-	private Location spawn1, spawn2;
+	private Location arenaCenterLoc, spawn1, spawn2;
 
 	private Lobby lobby;
 	private MessageHandler messages;
 	private CountDownTimer timer;
+	
+	private int arenaXWidth = 50;
+	private int arenaZWidth = 80;
 
 	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages) {
 		this.lobby = lobby;
+		this.arenaCenterLoc = arenaCenterLoc;
 		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
 		this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
 		spawn2.setYaw(-180);
@@ -62,8 +66,9 @@ public class DuelsGame implements CountDownTimerListener {
 			}
 		} else if (currentGameState == GameState.GAME_FINISH) {
 			for (DuelsPlayer dp : players) {
-				lobby.teleportToSpawn(dp.getPlayer());
 				dp.setGameWhereJoined(null);
+				clearPlayerInventoryAndEquipment(dp.getPlayer());
+				lobby.teleportToSpawn(dp.getPlayer());
 				dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
 				dp.getSidebarHandler().updateLobbySidebar();
 			}
@@ -72,29 +77,35 @@ public class DuelsGame implements CountDownTimerListener {
 			currentGameState = GameState.FREE;
 		}
 	}
+	
+	public void onPlayerDie(Player deadPlayer) {
+		
+		deadPlayer.setGameMode(GameMode.SPECTATOR);
+		deadPlayer.getWorld().strikeLightningEffect(deadPlayer.getLocation());
+		clearPlayerInventoryAndEquipment(deadPlayer);
+		
+		for (DuelsPlayer dp : players) {
+			if (!dp.getPlayer().equals(deadPlayer)) {
+				gameEnd(dp);
+				return;
+			}
+		}
+	}
 
-	public void gameEnd(Player winner) {
+	public void gameEnd(DuelsPlayer winner) {
 		currentGameState = GameState.GAME_FINISH;
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
-			p.getInventory().clear();
-			p.getInventory().setHelmet(null);
-			p.getInventory().setChestplate(null);
-			p.getInventory().setLeggings(null);
-			p.getInventory().setBoots(null);
-			
-			if (!p.equals(winner)) {
-				p.setGameMode(GameMode.SPECTATOR);
-				p.getWorld().strikeLightningEffect(p.getLocation());
-			}
 			
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage("");
 			p.sendMessage(
-					messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getName()));
+					messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getPlayer().getName()));
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 		}
+		
+		winner.addWin();
 		
 		timer.start(5, "");
 	}
@@ -150,6 +161,27 @@ public class DuelsGame implements CountDownTimerListener {
 			}
 		}
 	}
+	
+	public boolean isWithinArena(Location loc) {
+		
+		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld()))
+			return false;
+		
+		if (loc.getBlockX() < this.arenaCenterLoc.getBlockX() - this.arenaXWidth / 2
+				|| loc.getBlockX() > this.arenaCenterLoc.getBlockX() + this.arenaXWidth / 2
+				|| loc.getBlockZ() < this.arenaCenterLoc.getBlockZ() - this.arenaZWidth / 2
+				|| loc.getBlockZ() > this.arenaCenterLoc.getBlockZ() + this.arenaZWidth / 2) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean isUnderArena(Location loc) {
+		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld()))
+			return false;
+		
+		return loc.getBlockY() < this.arenaCenterLoc.getBlockY() - 4;
+	}
 
 	private void setKitItems(Player p, List<ItemStack> items) {
 		
@@ -175,5 +207,14 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 		
 		p.updateInventory();
+	}
+	
+	private void clearPlayerInventoryAndEquipment(Player player) {
+		
+		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
 	}
 }
