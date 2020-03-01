@@ -379,8 +379,15 @@ public class Events implements Listener, CommandExecutor {
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
 		
-		if (e.getCause().equals(TeleportCause.SPECTATE))
+		if (e.getCause().equals(TeleportCause.SPECTATE)) {
 			e.setCancelled(true);
+			return;
+		}
+		
+		if (p.getGameMode().equals(GameMode.SPECTATOR)) {
+			p.setSpectatorTarget(p);
+			return;
+		}
 		
 		if (!e.getCause().equals(TeleportCause.ENDER_PEARL)) {
 			return;
