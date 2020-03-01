@@ -63,7 +63,7 @@ public class Lobby {
 				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
 	}
 	
-	public void onPlayerLeave(DuelsPlayer dp) {	
+	public void onPlayerLeave(DuelsPlayer dp) {
 		players.remove(dp);
 	}
 	

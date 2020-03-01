@@ -283,9 +283,6 @@ public class Events implements Listener, CommandExecutor {
 		}
 	}
 	
-	
-	
-	
 	@EventHandler
 	public void onPlayerDrop(PlayerDropItemEvent e) {
 		if(e.getPlayer() != null) {
@@ -312,12 +309,14 @@ public class Events implements Listener, CommandExecutor {
 		if(dp == null) {
 			return;
 		}
+		if(dp.getGameWhereJoined() != null) {
+			dp.getGameWhereJoined().leaveGame(dp);
+		}
 		lobby.onPlayerLeave(dp);
 	}
 	
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
-		
 		Player p = e.getPlayer();
 		
 		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();

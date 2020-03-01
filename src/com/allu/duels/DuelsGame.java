@@ -83,8 +83,7 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 	}
 	
-	public void onPlayerDie(Player deadPlayer) {
-		
+	public void onPlayerDie(Player deadPlayer) {	
 		deadPlayer.setGameMode(GameMode.SPECTATOR);
 		deadPlayer.getWorld().strikeLightningEffect(deadPlayer.getLocation());
 		clearPlayerInventoryAndEquipment(deadPlayer);
@@ -97,8 +96,7 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 	}
 
-	public void gameEnd(DuelsPlayer winner) {
-		
+	public void gameEnd(DuelsPlayer winner) {	
 		currentGameState = GameState.GAME_FINISH;
 		
 		for (DuelsPlayer dp : players) {
@@ -145,6 +143,8 @@ public class DuelsGame implements CountDownTimerListener {
 
 	public void leaveGame(DuelsPlayer dp) {
 		players.remove(dp);
+		gameEnd(players.get(0));
+		
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
