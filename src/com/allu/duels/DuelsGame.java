@@ -96,6 +96,7 @@ public class DuelsGame implements CountDownTimerListener {
 		
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
+			lobby.clearPotionEffect(p);
 			
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage("");
