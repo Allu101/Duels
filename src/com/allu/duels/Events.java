@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -56,9 +57,12 @@ public class Events implements Listener, CommandExecutor {
 			System.out.println("[Duels] Komentoa ei voi käyttää consolesta");
 			return true;
 		}
+		
 		Player p = (Player)sender;
+		DuelsPlayer dp = lobby.getDuelsPlayer(p);
+		
 		if(cmd.getName().equalsIgnoreCase("duel")) {
-			DuelsPlayer dp = lobby.getDuelsPlayer(p);
+			
 			if(args.length == 1) {
 				Player opponent = Bukkit.getPlayerExact(args[0].toString());
 				if(opponent == null) {
@@ -116,6 +120,54 @@ public class Events implements Listener, CommandExecutor {
 			p.sendMessage(lobby.LINE);
 			return true;
 		}
+		
+		if(cmd.getName().equalsIgnoreCase("spectate")) {
+			
+			if(args.length == 1) {
+				
+				Player targetPlayer = Bukkit.getPlayerExact(args[0].toString());
+				
+				if(targetPlayer == null) {
+					p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
+					return true;
+				}
+				
+				if (targetPlayer.equals(p)) {
+					p.sendMessage(ChatColor.RED + "Et voi spectatea itseäsi.");
+					return true;
+				}
+				
+				DuelsPlayer targetDp = lobby.getDuelsPlayer(targetPlayer);
+
+				
+				if(targetDp.getGameWhereJoined() == null) {
+					p.sendMessage(ChatColor.RED + "Kyseinen pelaaja on tällä hetkellä lobbyssa");
+				}
+				else {
+					if(dp.getGameWhereJoined() != null) {
+						dp.getGameWhereJoined().leaveGame(dp);
+					}
+					
+					// THIS CODE IS DUPLICATE, TODO: CREATE A FUNCTION TO BE USED ACCROSS CLASSESS!!
+					p.getInventory().clear();
+					p.getInventory().setHelmet(null);
+					p.getInventory().setChestplate(null);
+					p.getInventory().setLeggings(null);
+					p.getInventory().setBoots(null);
+					
+					p.setGameMode(GameMode.SPECTATOR);
+					p.teleport(targetPlayer);
+				}
+
+			}
+			else {
+				p.sendMessage("§cKäyttö: /spectate <pelaajan nimi>");
+			}
+			
+			return true;
+		}
+		
+		
 		return false;
 	}
 	
