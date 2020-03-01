@@ -82,7 +82,20 @@ public class Lobby {
 		
 		teleportToSpawn(dp.getPlayer());
 		
-		if (!players.contains(dp))
+		boolean playerFound = false;
+		
+		for (DuelsPlayer dp2 : players) {
+			if (dp2.is(dp.getPlayer().getUniqueId().toString())) {
+				playerFound = true;
+				dp2.setWins(dp.getWins());
+				dp2.setBestWinStreak(dp.getBestWinStreak());
+				dp2.setCurrentWinStreak(dp.getCurrentWinStreak());
+				dp2.setEloScore(dp.getEloScore());
+				dp2.setPlayedGames(dp.getPlayedGames());
+			}
+		}
+		
+		if (!playerFound)
 			players.add(dp);
 	}
 	
