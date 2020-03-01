@@ -129,7 +129,7 @@ public class Duels extends JavaPlugin {
 			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
 				kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(kitPath + ".items." + item)));
 			}
-			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), config.getString(key + ".name") + " Duel"
+			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), config.getString(kitPath + ".name") + " Duel"
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
 			Kit kit = new Kit(kitMenuItem, kitItems, key);
 			
