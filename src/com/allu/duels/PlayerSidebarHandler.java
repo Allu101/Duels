@@ -28,7 +28,7 @@ public class PlayerSidebarHandler {
 	}
 
 	public void updateGameSidebar(String duelsMode) {
-		lobbySidebar.updateSidebar(getGameSidebarRows(duelsMode));
+		gameSidebar.updateSidebar(getGameSidebarRows(duelsMode));
 	}
 	
 	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames) {

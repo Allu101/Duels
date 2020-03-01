@@ -81,7 +81,7 @@ public class DuelsGame implements CountDownTimerListener {
 	public void onPlayerDie(Player deadPlayer) {	
 		deadPlayer.setGameMode(GameMode.SPECTATOR);
 		deadPlayer.getWorld().strikeLightningEffect(deadPlayer.getLocation());
-		clearPlayerInventoryAndEquipment(deadPlayer);
+		lobby.clearPlayerInventoryAndEquipment(deadPlayer);
 		
 		for (DuelsPlayer dp : players) {
 			if (!dp.getPlayer().equals(deadPlayer)) {
@@ -143,7 +143,6 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
-		
 		for (Entity entity : spawn1.getWorld().getEntities()) {
 			if (!entity.getType().equals(EntityType.ARMOR_STAND))
 				entity.remove();
@@ -158,6 +157,7 @@ public class DuelsGame implements CountDownTimerListener {
 			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 			getSpawn(p);
 			setKitItems(p, kit.getItems());
+			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
 			dp.getSidebarHandler().updateGameSidebar("1 vs 1");
 		}
@@ -221,12 +221,4 @@ public class DuelsGame implements CountDownTimerListener {
 		p.updateInventory();
 	}
 	
-	private void clearPlayerInventoryAndEquipment(Player player) {
-		
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
-	}
 }
