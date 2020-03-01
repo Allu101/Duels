@@ -1,6 +1,7 @@
 package com.allu.duels;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -8,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.allu.duels.utils.Gamemode;
@@ -25,7 +27,7 @@ public class Lobby {
 	private MenuHandler menuHandler;
 
 	public Lobby(FileConfiguration config, MenuHandler menuHandler) {
-		spawnLocation = new Location(Bukkit.getWorld(config.getString("lobbyworldname")), config.getInt("spawnloc.x"), config.getInt("spawnloc.y"), config.getInt("spawnloc.z"), 
+		spawnLocation = new Location(Bukkit.getWorld(config.getString("lobbyworldname")), config.getDouble("spawnloc.x"), config.getDouble("spawnloc.y"), config.getDouble("spawnloc.z"), 
 				config.getInt("spawnloc.yaw"), config.getInt("spawnloc.pitch"));
 		this.menuHandler = menuHandler;
 	}
@@ -90,6 +92,30 @@ public class Lobby {
 		p.setHealth(20);
 		clearPlayerInventoryAndEquipment(p);
 		menuHandler.setLobbyItems(p);
+	}
+	
+	public void setKitItems(Player p, List<ItemStack> items) {
+		p.getInventory().clear();
+		for (ItemStack is : items) {
+			String itemTypeString = is.getType().toString();
+			if (itemTypeString.contains("HELMET")) {
+				p.getInventory().setHelmet(new ItemStack(is));
+			}
+			else if (itemTypeString.contains("LEGGINGS")) {
+				p.getInventory().setLeggings(new ItemStack(is));
+			}
+			else if (itemTypeString.contains("CHESTPLATE")) {
+				p.getInventory().setChestplate(new ItemStack(is));
+			}
+			else if (itemTypeString.contains("_BOOTS")) {
+				p.getInventory().setBoots(new ItemStack(is));
+			}
+			else {
+				p.getInventory().addItem(new ItemStack(is));
+			}
+		}
+		
+		p.updateInventory();
 	}
 	
 	public void clearPlayerInventoryAndEquipment(Player player) {

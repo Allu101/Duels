@@ -23,7 +23,7 @@ firstarenacenter:
     yaw: 0
 
 duels1v1:
-  gamesavailable: 25
+  gamesavailable: 30
 
 duels2v2:
   gamesavailable: 7
@@ -33,17 +33,6 @@ duels4v4:
   
 kits:
   classic:
-    menuitem: IRON_SWORD
+    menuitem: ''
     items:
-      IRON_SWORD: 1
-      BOW: 1
-      FLINT_AND_STEEL: 1
-      ARROW: 5
-      FISHING_ROD: 1
-  op:
-    menuitem: DIAMOND_CHESTPLATE
-    items:
-      DIAMOND_SWORD: 1
-      FISHING_ROD: 1
-      ENDER_PEARL: 5
-      GOLDEN_APPLE: 1
+#      itemName: amount

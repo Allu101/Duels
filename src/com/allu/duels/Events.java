@@ -394,8 +394,6 @@ public class Events implements Listener, CommandExecutor {
 		}
 	}
 	
-	
-	
 	private Player getDamager(EntityDamageByEntityEvent e) {
 		Entity damager = e.getDamager();
 		if(damager instanceof Arrow) {

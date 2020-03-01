@@ -96,6 +96,7 @@ public class DuelsGame implements CountDownTimerListener {
 		
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
+			lobby.clearPotionEffect(p);
 			
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage("");
@@ -139,13 +140,17 @@ public class DuelsGame implements CountDownTimerListener {
 	public void leaveGame(DuelsPlayer dp) {
 		players.remove(dp);
 		gameEnd(players.get(0));
-		
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
 		for (Entity entity : spawn1.getWorld().getEntities()) {
-			if (!entity.getType().equals(EntityType.ARMOR_STAND))
+			EntityType eType = entity.getType();
+			if (!eType.equals(EntityType.ARMOR_STAND)) {
 				entity.remove();
+			}
+			if(eType.equals(EntityType.ARROW) && isWithinArena(entity.getLocation())) {
+				entity.remove();
+			}
 		}
 		
 		currentGameState = GameState.STARTING;
@@ -156,7 +161,7 @@ public class DuelsGame implements CountDownTimerListener {
 			timer.addPlayer(p);
 			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 			getSpawn(p);
-			setKitItems(p, kit.getItems());
+			lobby.setKitItems(p, kit.getItems());
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
 			dp.getSidebarHandler().updateGameSidebar("1 vs 1");
@@ -175,50 +180,25 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	public boolean isWithinArena(Location loc) {
-		
-		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld()))
+		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld())) {
 			return false;
-		
-		if (loc.getBlockX() < this.arenaCenterLoc.getBlockX() - this.arenaXWidth / 2
-				|| loc.getBlockX() > this.arenaCenterLoc.getBlockX() + this.arenaXWidth / 2
-				|| loc.getBlockZ() < this.arenaCenterLoc.getBlockZ() - this.arenaZWidth / 2
-				|| loc.getBlockZ() > this.arenaCenterLoc.getBlockZ() + this.arenaZWidth / 2) {
+		}
+		long halfArenaXWidht = this.arenaXWidth / 2;
+		long halfArenaZWidht = this.arenaZWidth / 2;
+		if (loc.getBlockX() < this.arenaCenterLoc.getBlockX() - halfArenaXWidht
+				|| loc.getBlockX() > this.arenaCenterLoc.getBlockX() + halfArenaXWidht
+				|| loc.getBlockZ() < this.arenaCenterLoc.getBlockZ() - halfArenaZWidht
+				|| loc.getBlockZ() > this.arenaCenterLoc.getBlockZ() + halfArenaZWidht) {
 			return false;
 		}
 		return true;
 	}
 	
 	public boolean isUnderArena(Location loc) {
-		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld()))
+		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld())) {
 			return false;
-		
-		return loc.getBlockY() < this.arenaCenterLoc.getBlockY() - 4;
-	}
-
-	private void setKitItems(Player p, List<ItemStack> items) {
-		
-		p.getInventory().clear();
-		
-		for (ItemStack is : items) {
-
-			if (is.getType().toString().contains("HELMET")) {
-				p.getInventory().setHelmet(new ItemStack(is));
-			}
-			else if (is.getType().toString().contains("LEGGINGS")) {
-				p.getInventory().setLeggings(new ItemStack(is));
-			}
-			else if (is.getType().toString().contains("CHESTPLATE")) {
-				p.getInventory().setChestplate(new ItemStack(is));
-			}
-			else if (is.getType().toString().contains("_BOOTS")) {
-				p.getInventory().setBoots(new ItemStack(is));
-			}
-			else {
-				p.getInventory().addItem(new ItemStack(is));
-			}
 		}
-		
-		p.updateInventory();
+		return loc.getBlockY() < this.arenaCenterLoc.getBlockY() - 4;
 	}
 	
 }
