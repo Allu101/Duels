@@ -37,7 +37,9 @@ public class Duels extends JavaPlugin {
 	private Lobby lobby;
 	private MenuHandler menuHandler;
 	
+	
 	private SimpleRanking winsRanking;
+	private SimpleRanking eloRanking;
 	
 
 	
@@ -51,6 +53,7 @@ public class Duels extends JavaPlugin {
 	    saveConfig();
 	    
 	    winsRanking = new SimpleRanking(dbHandler.loadTop10PlayersToWinsScoreboard());
+	    eloRanking = new SimpleRanking(dbHandler.loadTop10PlayersToEloScoreScoreboard());
 	    
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
@@ -71,6 +74,8 @@ public class Duels extends JavaPlugin {
 		World world = Bukkit.getWorld(LOBBY_WORLD);
 		winsRanking.addFloatingRankingList(new Location(world, 5.5, 12, -37.5),
 				"" + ChatColor.BLUE + ChatColor.BOLD + "- Voitot -", ChatColor.BLUE, ChatColor.GREEN);	
+		eloRanking.addFloatingRankingList(new Location(world, 27.5, 12, -15.5),
+				"" + ChatColor.BLUE + ChatColor.BOLD + "- Rankingpisteet -", ChatColor.BLUE, ChatColor.GREEN);	
 	}
 	
 	@Override
@@ -92,7 +97,7 @@ public class Duels extends JavaPlugin {
 		for (int i = 0; i < available_games; i++) {
 			String gameWorld = "gameworld_" + gameMode.getString();
 		    createWorldIfDoesntExist(gameWorld);
-			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, new MessageHandler(), this.winsRanking));
+			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, new MessageHandler(), this.winsRanking, this.eloRanking));
 		}
 	}
 	

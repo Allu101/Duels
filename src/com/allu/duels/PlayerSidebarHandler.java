@@ -13,7 +13,7 @@ public class PlayerSidebarHandler {
 	private String netAddress_row = ChatColor.GOLD + "www.slinkoncraft.net";
 	
 	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows(""));
-	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0));
+	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	
 	public PlayerSidebarHandler() {
 		gameSidebar.updateSidebar(getGameSidebarRows(""));
@@ -31,8 +31,8 @@ public class PlayerSidebarHandler {
 		gameSidebar.updateSidebar(getGameSidebarRows(duelsMode));
 	}
 	
-	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames) {
-		lobbySidebar.updateSidebar(getLobbySidebarRows(wins, currentWinStreak, bestWinStreak, playedGames));
+	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
+		lobbySidebar.updateSidebar(getLobbySidebarRows(wins, currentWinStreak, bestWinStreak, playedGames, eloScore));
 	}
 	
 	private ArrayList<String> getGameSidebarRows(String duelsMode) {
@@ -44,16 +44,18 @@ public class PlayerSidebarHandler {
 		return rows;
 	}
 	
-	private ArrayList<String> getLobbySidebarRows(int wins, int currentWinStreak, int bestWinStreak, int playedGames) {
+	private ArrayList<String> getLobbySidebarRows(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
 		String totalWins_row = ChatColor.GRAY + "Voittoja: " + ChatColor.GOLD + wins;
+		String rankingRow = ChatColor.GRAY + "Rankingpisteet: " + ChatColor.GOLD + eloScore;
 		String bestWinStreak_row = ChatColor.GRAY + "Parhain voittoputki: " + ChatColor.GOLD + bestWinStreak;
 		String currentWinStreak_row = ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak;
 		String playedGamesRow = ChatColor.GRAY + "Pelatut pelit: " + ChatColor.GOLD + playedGames;
 		
 		rows.add("");
 		rows.add(totalWins_row);
+		rows.add(rankingRow);
 		rows.add("");
 		rows.add(bestWinStreak_row);
 		rows.add(currentWinStreak_row);

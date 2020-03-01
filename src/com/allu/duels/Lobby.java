@@ -78,7 +78,7 @@ public class Lobby {
 		
 		dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
 		dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
-				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
+				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames(), dp.getEloScore());
 		
 		teleportToSpawn(dp.getPlayer());
 		

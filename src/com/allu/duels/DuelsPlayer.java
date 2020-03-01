@@ -13,6 +13,7 @@ public class DuelsPlayer {
 	private int currentWinStreak;
 	private int playedGames;
 	private int wins;
+	private int eloScore;
 	
 	public DuelsPlayer(Player p, PlayerSidebarHandler sidebarHandler) {
 		this.player = p;
@@ -102,6 +103,15 @@ public class DuelsPlayer {
 	
 	public void setWins(int wins) {
 		this.wins = wins;
+	}
+	
+	
+	public int getEloScore() {
+		return eloScore;
+	}
+	
+	public void setEloScore(int score) {
+		this.eloScore = score;
 	}
 	
 }

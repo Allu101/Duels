@@ -10,7 +10,6 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
@@ -39,8 +38,9 @@ public class DuelsGame implements CountDownTimerListener {
 	private int arenaZWidth = 80;
 	
 	private SimpleRanking winsRanking;
+	private SimpleRanking eloRanking;
 
-	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages, SimpleRanking winsRanking) {
+	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages, SimpleRanking winsRanking, SimpleRanking eloRanking) {
 		this.lobby = lobby;
 		this.arenaCenterLoc = arenaCenterLoc;
 		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
@@ -50,6 +50,7 @@ public class DuelsGame implements CountDownTimerListener {
 		this.timer = new CountDownTimer(this);
 		this.messages = messages;
 		this.winsRanking = winsRanking;
+		this.eloRanking = eloRanking;
 	}
 
 	@Override
@@ -111,12 +112,35 @@ public class DuelsGame implements CountDownTimerListener {
 				dp.addLose();
 			}
 			
+			for (DuelsPlayer dp2 : players) {
+				if (dp.equals(dp2))
+					continue;
+				
+				double result = 0;
+				if (dp.equals(winner))
+					result = 1;
+				
+				double expectedScore = getExpectedScore(dp.getEloScore(), dp2.getEloScore());
+				double eloChange = (result - expectedScore) * 32;
+				int finalEloChange = Math.max((int)Math.round(eloChange), 0);
+				
+				dp.setEloScore(dp.getEloScore() + finalEloChange);
+			}
+			
+			
 			Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
 		}
 		
 		winsRanking.updateRankingWithPlayers(Duels.plugin.dbHandler.loadTop10PlayersToWinsScoreboard());
+		eloRanking.updateRankingWithPlayers(Duels.plugin.dbHandler.loadTop10PlayersToEloScoreScoreboard());
 		
 		timer.start(5, "");
+	}
+	
+	
+	
+	private double getExpectedScore(int eloOwn, int eloOther) {
+		return 1.0 / (1.0 + Math.pow(10, (eloOther - eloOwn) / 400.0));
 	}
 
 	
@@ -138,8 +162,8 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void leaveGame(DuelsPlayer dp) {
-		players.remove(dp);
 		gameEnd(players.get(0));
+		players.remove(dp);
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {

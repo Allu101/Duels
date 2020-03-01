@@ -57,9 +57,9 @@ public class DatabaseHandler {
 		openConnection();
 		try {
 			PreparedStatement sql = connection.prepareStatement(
-					"INSERT INTO duels (uuid, name, wins, playedGames, currentWinStreak, highestWinStreak) "
-					+ "VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
-					+ "name=?, wins=?, playedGames=?, currentWinStreak=?, highestWinStreak=?");
+					"INSERT INTO duels (uuid, name, wins, playedGames, currentWinStreak, highestWinStreak, eloScore) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
+					+ "name=?, wins=?, playedGames=?, currentWinStreak=?, highestWinStreak=?, eloScore=?");
 			
 			sql.setString(1, dp.getPlayer().getUniqueId().toString());
 			sql.setString(2, dp.getPlayer().getName());
@@ -67,12 +67,14 @@ public class DatabaseHandler {
 			sql.setInt(4, dp.getPlayedGames());
 			sql.setInt(5, dp.getCurrentWinStreak());
 			sql.setInt(6, dp.getBestWinStreak());
+			sql.setInt(7, dp.getEloScore());
 			
-			sql.setString(7, dp.getPlayer().getName());
-			sql.setInt(8, dp.getWins());
-			sql.setInt(9, dp.getPlayedGames());
-			sql.setInt(10, dp.getCurrentWinStreak());
-			sql.setInt(11, dp.getBestWinStreak());
+			sql.setString(8, dp.getPlayer().getName());
+			sql.setInt(9, dp.getWins());
+			sql.setInt(10, dp.getPlayedGames());
+			sql.setInt(11, dp.getCurrentWinStreak());
+			sql.setInt(12, dp.getBestWinStreak());
+			sql.setInt(13, dp.getEloScore());
 			
 			sql.executeUpdate();
 			sql.close();
@@ -94,7 +96,7 @@ public class DatabaseHandler {
 		openConnection();
 		try {
 			PreparedStatement sql = connection.prepareStatement(
-					"SELECT wins, playedGames, currentWinStreak, highestWinStreak FROM duels WHERE uuid=?");
+					"SELECT wins, playedGames, currentWinStreak, highestWinStreak, eloScore FROM duels WHERE uuid=?");
 			
 			sql.setString(1, dp.getPlayer().getUniqueId().toString());
 			ResultSet result = sql.executeQuery();
@@ -104,6 +106,7 @@ public class DatabaseHandler {
 				dp.setPlayedGames(result.getInt(2));
 				dp.setCurrentWinStreak(result.getInt(3));
 				dp.setBestWinStreak(result.getInt(4));
+				dp.setEloScore(result.getInt(5));
 			}
 			
 			result.close();
@@ -145,6 +148,35 @@ public class DatabaseHandler {
 			return players;
 		} catch (NullPointerException e) {
 			System.out.println("DatabaseHandler nullPointer - loadTop10PlayersToWinsScoreboard()");
+			return players;
+		}
+	}
+	
+	
+	public synchronized ArrayList<RankedPlayer> loadTop10PlayersToEloScoreScoreboard() {
+		openConnection();
+		ArrayList<RankedPlayer> players = new ArrayList<RankedPlayer>();
+		try {
+			PreparedStatement sql = connection.prepareStatement("SELECT uuid, name, eloScore FROM duels ORDER BY eloScore DESC LIMIT 10");
+			
+			ResultSet result = sql.executeQuery();
+
+			while (result.next()) {
+				players.add(new RankedPlayer(result.getString(1), result.getString(2), result.getInt(3)));
+			}
+			
+			result.close();
+			sql.close();
+			closeConnection();
+			
+			return players;
+			
+		} catch (SQLException e) {
+			System.out.println("DatabaseHandler error - loadTop10PlayersToEloScoreScoreboard()");
+			closeConnection();
+			return players;
+		} catch (NullPointerException e) {
+			System.out.println("DatabaseHandler nullPointer - loadTop10PlayersToEloScoreScoreboard()");
 			return players;
 		}
 	}
