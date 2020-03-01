@@ -32,7 +32,7 @@ public class MenuHandler {
 		Inventory inv = Bukkit.getServer().createInventory(null, 36, ChatColor.BLUE + "" + ChatColor.BOLD + "Valise kitti");
 		int i = 10;
 		for(Kit kit : duels.getKits()) {
-			if(i % 8 == 0) {
+			if(i == 17 || i == 26) {
 				i += 2;
 			}
 			inv.setItem(i, kit.getMenuItem());
