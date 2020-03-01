@@ -33,6 +33,7 @@ duels4v4:
   
 kits:
   classic:
-    menuitem: ''
+    name: Classic
+    menuitem: IRON_SWORD
     items:
-#      itemName: amount
+      IRON_SWORD: 1

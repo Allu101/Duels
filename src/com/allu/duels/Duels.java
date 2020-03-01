@@ -122,16 +122,14 @@ public class Duels extends JavaPlugin {
 	}
 	
 	private void loadKitsFromConfig() {
-		
-		for (String key : config.getConfigurationSection("kits").getKeys(false)) {
-			
+		for (String key : config.getConfigurationSection("kits").getKeys(false)) {	
 			String kitPath = "kits." + key;
-			
 			List<ItemStack> kitItems = new ArrayList<>();
+			
 			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
 				kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(kitPath + ".items." + item)));
 			}
-			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), key + " Duel"
+			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), config.getString(key + ".name") + " Duel"
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
 			Kit kit = new Kit(kitMenuItem, kitItems, key);
 			
