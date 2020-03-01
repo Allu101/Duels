@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 
 import com.allu.duels.utils.ChallengeCreatedEvent;
@@ -377,6 +378,13 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
+		
+		if (e.getCause().equals(TeleportCause.SPECTATE))
+			e.setCancelled(true);
+		
+		if (!e.getCause().equals(TeleportCause.ENDER_PEARL)) {
+			return;
+		}
 		
 		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
 		
