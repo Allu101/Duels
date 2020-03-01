@@ -10,7 +10,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
