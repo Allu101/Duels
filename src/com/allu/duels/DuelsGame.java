@@ -162,8 +162,10 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void leaveGame(DuelsPlayer dp) {
-		gameEnd(players.get(0));
 		players.remove(dp);
+		if(players.size() > 0) {
+			gameEnd(players.get(0));
+		}
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
