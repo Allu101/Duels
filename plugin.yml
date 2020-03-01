@@ -7,3 +7,10 @@ commands:
       description: main command
       usage: /<command>
       aliases: [d]
+    spectate:
+      description: command to spectate players
+      usage: /<command>
+      aliases: [sp]
+      permission: duels.spectate
+      permission-message: Sinulla ei ole oikeuksia tuohon!
+      
