@@ -377,7 +377,15 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
+		
+		if (e.getPlayer() == null)
+			return;
+		
 		Player p = e.getPlayer();
+		
+		if (e.getCause().equals(TeleportCause.PLUGIN)) {
+			return;
+		}
 		
 		if (e.getCause().equals(TeleportCause.SPECTATE)) {
 			e.setCancelled(true);
@@ -400,21 +408,4 @@ public class Events implements Listener, CommandExecutor {
 			p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
 		}
 	}
-	
-	private Player getDamager(EntityDamageByEntityEvent e) {
-		Entity damager = e.getDamager();
-		if(damager instanceof Arrow) {
-			Arrow arrow = (Arrow) damager;
-			if(arrow.getShooter() instanceof Player) {
-				return (Player) arrow.getShooter();
-			}
-		} else if(damager instanceof FishHook)  {
-			FishHook fh = (FishHook) damager;
-			return (Player) fh.getShooter();
-		} else if(damager instanceof Player) {
-			return (Player) damager;
-		}
-		return null;
-	}
-
 }

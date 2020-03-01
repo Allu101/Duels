@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
@@ -74,6 +75,8 @@ public class Lobby {
 	 */
 	public void sendPlayerToLobby(DuelsPlayer dp) {
 		
+		System.out.println("Sending " + dp.getPlayer().getName() + " to lobby...");
+		
 		dp.setGameWhereJoined(null);
 		
 		dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
@@ -100,7 +103,7 @@ public class Lobby {
 	}
 	
 	public void teleportToSpawn(Player p) {
-		p.teleport(spawnLocation);
+		p.teleport(spawnLocation, TeleportCause.PLUGIN);
 		p.setGameMode(GameMode.ADVENTURE);
 		p.setHealth(20);
 		clearPlayerInventoryAndEquipment(p);

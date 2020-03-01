@@ -12,6 +12,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
@@ -62,28 +64,34 @@ public class DuelsGame implements CountDownTimerListener {
 
 	@Override
 	public void onCountDownFinish() {
-		if (currentGameState == GameState.STARTING) {
-			currentGameState = GameState.PLAYING;
-			for (DuelsPlayer dp : players) {
-				Player p = dp.getPlayer();
-				p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
-				p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
-				sendTitle(p, "Duels alkaa", 0, 40, 20, ChatColor.GREEN);
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " times 0 20 10");
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " title {\"text\":\"Duels alkaa!\",\"bold\":true,\"color\":\"blue\"}");
+		Bukkit.getScheduler().runTask(Duels.plugin, new Runnable() {
+
+			@Override
+			public void run() {
+				if (currentGameState == GameState.STARTING) {
+					currentGameState = GameState.PLAYING;
+					for (DuelsPlayer dp : players) {
+						Player p = dp.getPlayer();
+						p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
+						p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
+						sendTitle(p, "Duels alkaa", 0, 40, 20, ChatColor.GREEN);
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+								"title " + p.getName() + " times 0 20 10");
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+								"title " + p.getName() + " title {\"text\":\"Duels alkaa!\",\"bold\":true,\"color\":\"blue\"}");
+					}
+				} else if (currentGameState == GameState.GAME_FINISH) {
+					
+					for (DuelsPlayer dp : players) {
+						lobby.sendPlayerToLobby(dp);
+					}
+					
+					timer.clearPlayers();
+					players.clear();
+					currentGameState = GameState.FREE;
+				}
 			}
-		} else if (currentGameState == GameState.GAME_FINISH) {
-			
-			for (DuelsPlayer dp : players) {
-				lobby.sendPlayerToLobby(dp);
-			}
-			
-			timer.clearPlayers();
-			players.clear();
-			currentGameState = GameState.FREE;
-		}
+		});
 	}
 	
 	public void onPlayerDie(Player deadPlayer) {	
@@ -195,6 +203,7 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 		
 		currentGameState = GameState.STARTING;
+		players.clear();
 		for (DuelsPlayer dp : dplayers) {
 			players.add(dp);
 			Player p = dp.getPlayer();
@@ -213,9 +222,19 @@ public class DuelsGame implements CountDownTimerListener {
 	private void getSpawn(Player p) {
 		for (int i = 0; i < players.size(); i++) {
 			if (i % 2 == 0) {
-				p.teleport(spawn1);
+				Bukkit.getScheduler().runTask(Duels.plugin, new Runnable() {
+					@Override
+					public void run() {
+						p.teleport(spawn1, TeleportCause.PLUGIN);
+					}
+				});
 			} else {
-				p.teleport(spawn2);
+				Bukkit.getScheduler().runTask(Duels.plugin, new Runnable() {
+					@Override
+					public void run() {
+						p.teleport(spawn2, TeleportCause.PLUGIN);
+					}
+				});
 			}
 		}
 	}
