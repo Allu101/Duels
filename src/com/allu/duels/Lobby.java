@@ -8,7 +8,10 @@ import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+
 import com.allu.duels.utils.Gamemode;
+
 import net.md_5.bungee.api.ChatColor;
 
 public class Lobby {
@@ -71,7 +74,21 @@ public class Lobby {
 		p.teleport(spawnLocation);
 		p.setGameMode(GameMode.ADVENTURE);
 		p.setHealth(20);
+		clearPlayerInventoryAndEquipment(p);
 		menuHandler.setLobbyItems(p);
 	}
 	
+	public void clearPlayerInventoryAndEquipment(Player player) {
+		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
+	}
+	
+	public void clearPotionEffect(Player p) {
+		for(PotionEffect effect : p.getActivePotionEffects()) {
+		    p.removePotionEffect(effect.getType());
+		}
+	}
 }
