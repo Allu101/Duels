@@ -377,7 +377,6 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent e) {
 		Player p = e.getPlayer();
-		
 		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
 		
 		if (gameWhereJoined != null && !gameWhereJoined.isWithinArena(e.getTo())) {
@@ -385,8 +384,6 @@ public class Events implements Listener, CommandExecutor {
 			p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
 		}
 	}
-	
-	
 	
 	private Player getDamager(EntityDamageByEntityEvent e) {
 		Entity damager = e.getDamager();

@@ -10,7 +10,7 @@ import com.allu.minigameapi.player.SidebarHandler;
 public class PlayerSidebarHandler {
 	
 	private String header = ChatColor.BLUE + "" + ChatColor.BOLD + " Duels ";
-	private String netAddress_row = ChatColor.GRAY + "www.slinkoncraft.net";
+	private String netAddress_row = ChatColor.GOLD + "www.slinkoncraft.net";
 	
 	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows(""));
 	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0));
@@ -48,15 +48,15 @@ public class PlayerSidebarHandler {
 		ArrayList<String> rows = new ArrayList<String>();
 		
 		String totalWins_row = ChatColor.GRAY + "Voittoja: " + ChatColor.GOLD + wins;
-		String currentWinStreak_row = ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak;
 		String bestWinStreak_row = ChatColor.GRAY + "Parhain voittoputki: " + ChatColor.GOLD + bestWinStreak;
+		String currentWinStreak_row = ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak;
 		String playedGamesRow = ChatColor.GRAY + "Pelatut pelit: " + ChatColor.GOLD + playedGames;
 		
 		rows.add("");
 		rows.add(totalWins_row);
 		rows.add("");
-		rows.add(currentWinStreak_row);
 		rows.add(bestWinStreak_row);
+		rows.add(currentWinStreak_row);
 		rows.add("");
 		rows.add(playedGamesRow);
 		rows.add("");

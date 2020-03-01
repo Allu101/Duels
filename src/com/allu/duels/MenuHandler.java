@@ -61,8 +61,8 @@ public class MenuHandler {
 	public void setLobbyItems(Player p) {
 		p.getInventory().clear();
 		PlayerInventory pInv = p.getInventory();
-		pInv.setItem(0, queueJoinItem);
-		pInv.setItem(1, challengeItem);
+//		pInv.setItem(0, queueJoinItem);
+		pInv.setItem(0, challengeItem);
 	}
 	
 	public ItemStack getChallengeItem() {
