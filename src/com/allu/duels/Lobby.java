@@ -56,15 +56,29 @@ public class Lobby {
 	public void onPlayerJoin(Player p) {
 		DuelsPlayer dp = new DuelsPlayer(p, new PlayerSidebarHandler());
 		Duels.plugin.dbHandler.loadStatsSQL(dp);
-		players.add(dp);
-		teleportToSpawn(p);
-		p.setScoreboard(dp.getSidebarHandler().getLobbyBoard());
-		dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
-				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
+		sendPlayerToLobby(dp);
 	}
 	
 	public void onPlayerLeave(DuelsPlayer dp) {
 		players.remove(dp);
+	}
+	
+	/**
+	 * This method should be used for returning players back to lobby!
+	 * @param dp
+	 */
+	public void sendPlayerToLobby(DuelsPlayer dp) {
+		
+		dp.setGameWhereJoined(null);
+		
+		dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
+		dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
+				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
+		
+		teleportToSpawn(dp.getPlayer());
+		
+		if (!players.contains(dp))
+			players.add(dp);
 	}
 	
 	public void teleportToSpawn(Player p) {

@@ -61,6 +61,7 @@ public class Duels extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(events, this);
 		this.getCommand("duel").setExecutor(events);
 		this.getCommand("spectate").setExecutor(events);
+		this.getCommand("lobby").setExecutor(events);
 		
 	    loadKitsFromConfig();
 		createGames(Gamemode.DUELS_1V1);

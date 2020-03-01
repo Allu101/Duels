@@ -167,6 +167,17 @@ public class Events implements Listener, CommandExecutor {
 			return true;
 		}
 		
+		if(cmd.getName().equalsIgnoreCase("lobby")) {
+			
+			if(dp.getGameWhereJoined() != null) {
+				dp.getGameWhereJoined().leaveGame(dp);
+			}
+			
+			lobby.teleportToSpawn(dp.getPlayer());
+
+			return true;
+		}
+		
 		
 		return false;
 	}

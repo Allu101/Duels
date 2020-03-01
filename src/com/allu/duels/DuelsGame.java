@@ -67,16 +67,11 @@ public class DuelsGame implements CountDownTimerListener {
 				p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
 			}
 		} else if (currentGameState == GameState.GAME_FINISH) {
+			
 			for (DuelsPlayer dp : players) {
-				dp.setGameWhereJoined(null);
-				clearPlayerInventoryAndEquipment(dp.getPlayer());
-				lobby.teleportToSpawn(dp.getPlayer());
-				
-				dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
-						dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames());
-				
-				dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
+				lobby.sendPlayerToLobby(dp);
 			}
+			
 			timer.clearPlayers();
 			players.clear();
 			currentGameState = GameState.FREE;

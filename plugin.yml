@@ -13,4 +13,8 @@ commands:
       aliases: [sp]
       permission: duels.spectate
       permission-message: Sinulla ei ole oikeuksia tuohon!
+    lobby:
+      description: return to lobby
+      usage: /<command>
+      aliases: []
       
