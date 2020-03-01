@@ -148,12 +148,8 @@ public class Events implements Listener, CommandExecutor {
 						dp.getGameWhereJoined().leaveGame(dp);
 					}
 					
-					// THIS CODE IS DUPLICATE, TODO: CREATE A FUNCTION TO BE USED ACCROSS CLASSESS!!
-					p.getInventory().clear();
-					p.getInventory().setHelmet(null);
-					p.getInventory().setChestplate(null);
-					p.getInventory().setLeggings(null);
-					p.getInventory().setBoots(null);
+					lobby.clearPlayerInventoryAndEquipment(p);
+					lobby.clearPotionEffect(p);
 					
 					p.setGameMode(GameMode.SPECTATOR);
 					p.teleport(targetPlayer);
