@@ -306,7 +306,7 @@ public class Events implements Listener, CommandExecutor {
 		}
 		
 		// Checks if player is under arena. The player is announced as being dead.
-		if (gameWhereJoined.isUnderArena(damaged.getLocation())) {
+		if (gameWhereJoined.isUnderArena(damaged.getLocation()) || !gameWhereJoined.isWithinArena(damaged.getLocation())) {
 			e.setCancelled(true);
 			gameWhereJoined.onPlayerDie(damaged);
 		}
