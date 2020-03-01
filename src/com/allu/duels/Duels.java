@@ -72,9 +72,9 @@ public class Duels extends JavaPlugin {
 //		createGames(Gamemode.DUELS_4V4);
 		
 		World world = Bukkit.getWorld(LOBBY_WORLD);
-		winsRanking.addFloatingRankingList(new Location(world, 5.5, 12, -37.5),
+		winsRanking.addFloatingRankingList(new Location(world, 5.5, 11, -37.5),
 				"" + ChatColor.BLUE + ChatColor.BOLD + "- Voitot -", ChatColor.BLUE, ChatColor.GREEN);	
-		eloRanking.addFloatingRankingList(new Location(world, 27.5, 12, -15.5),
+		eloRanking.addFloatingRankingList(new Location(world, 27.5, 11, -15.5),
 				"" + ChatColor.BLUE + ChatColor.BOLD + "- Rankingpisteet -", ChatColor.BLUE, ChatColor.GREEN);	
 	}
 	
