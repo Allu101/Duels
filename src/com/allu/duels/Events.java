@@ -400,13 +400,15 @@ public class Events implements Listener, CommandExecutor {
 		}
 		
 		if (e.getCause().equals(TeleportCause.ENDER_PEARL)) {
-			e.setCancelled(true);
-			p.teleport(e.getTo());
+
 			DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
 			
 			if (gameWhereJoined != null && !gameWhereJoined.isWithinArena(e.getTo())) {
 				e.setCancelled(true);
 				p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
+			} else {
+				e.setCancelled(true);
+				p.teleport(e.getTo());
 			}
 			return;
 		}
