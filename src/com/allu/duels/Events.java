@@ -28,6 +28,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -407,5 +408,11 @@ public class Events implements Listener, CommandExecutor {
 			e.setCancelled(true);
 			p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerItemDamage(PlayerItemDamageEvent e) {
+		e.getItem().setDurability((short)0);
+		e.setCancelled(true);
 	}
 }
