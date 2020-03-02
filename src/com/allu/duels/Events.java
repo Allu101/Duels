@@ -109,6 +109,7 @@ public class Events implements Listener, CommandExecutor {
 								return true;
 							} else {
 								p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
+								return true;
 							}
 						}
 					}

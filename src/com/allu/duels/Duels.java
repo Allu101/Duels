@@ -14,7 +14,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -101,6 +100,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	private void createGames(Gamemode gameMode) {
 		String path = "duels" + gameMode.getString();
 		int available_games = config.getInt(path + ".gamesavailable");
+		System.out.println(gameMode.toString() + " games available: " + available_games);
 		for (int i = 0; i < available_games; i++) {
 			String gameWorld = "gameworld_" + gameMode.getString();
 		    createWorldIfDoesntExist(gameWorld);
@@ -138,21 +138,35 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 				
 				String itemPath = kitPath + ".items." + item;
 				
+				
 				if (!config.isConfigurationSection(itemPath)) {
-					kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(itemPath, 1)));
+					
+					Material mat = Material.STONE;
+					if (Material.getMaterial(item) != null) {
+						mat = Material.getMaterial(item);
+					} else {
+						System.out.println("Error loadin: " + itemPath);
+					}
+					ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
+					
+					if (is != null)
+						kitItems.add(is);
 				}
 				else {
 					
 					ItemStack is = new ItemStack(Material.getMaterial(item), config.getInt(itemPath + ".amount", 1));
 					
-					String enchantmentsPath = itemPath + ".enchantments";
-					if (config.isConfigurationSection(enchantmentsPath)) {
-						for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
-							is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
-						}
-					}
 					
-					kitItems.add(is);
+					if (is != null) {
+						String enchantmentsPath = itemPath + ".enchantments";
+						if (config.isConfigurationSection(enchantmentsPath)) {
+							for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
+								is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
+							}
+						}
+						
+						kitItems.add(is);
+					}
 				}
 			}
 			
@@ -171,6 +185,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
 		if(cmd.getName().equalsIgnoreCase("duelsreload")) {
+			this.reloadConfig();
 			this.kits.clear();
 			this.loadKitsFromConfig();
 			sender.sendMessage("§aKits have been reloaded!");

@@ -43,6 +43,9 @@ public class Lobby {
 				return game;
 			}
 		}
+		
+		System.out.println("gameCount: " + games.size());
+		
 		return null;
 	}
 	
