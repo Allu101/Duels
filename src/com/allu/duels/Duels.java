@@ -71,7 +71,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		this.getCommand("spectate").setExecutor(events);
 		this.getCommand("lobby").setExecutor(events);
 		
-		this.getCommand("duels").setExecutor(this);
+		this.getCommand("duelsreload").setExecutor(this);
 		
 	    loadKitsFromConfig();
 		createGames(Gamemode.DUELS_1V1);
@@ -156,10 +156,10 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 				}
 			}
 			
-			
-			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), config.getString(kitPath + ".name") + " Duel"
+			String kitName = config.getString(kitPath + ".name") + " Duel";
+			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), kitName
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
-			Kit kit = new Kit(kitMenuItem, kitItems, kitPath + ".name");
+			Kit kit = new Kit(kitMenuItem, kitItems, kitName);
 			
 			kits.add(kit);
 		}
@@ -170,7 +170,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
-		if(cmd.getName().equalsIgnoreCase("duels") && args.length == 1 && args[0].equals("reload")) {
+		if(cmd.getName().equalsIgnoreCase("duelsreload")) {
 			this.kits.clear();
 			this.loadKitsFromConfig();
 			sender.sendMessage("§aKits have been reloaded!");
