@@ -131,7 +131,7 @@ public class Duels extends JavaPlugin {
 			}
 			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), config.getString(kitPath + ".name") + " Duel"
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
-			Kit kit = new Kit(kitMenuItem, kitItems, key);
+			Kit kit = new Kit(kitMenuItem, kitItems, kitPath + ".name");
 			
 			kits.add(kit);
 		}
