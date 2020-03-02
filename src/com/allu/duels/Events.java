@@ -222,8 +222,8 @@ public class Events implements Listener, CommandExecutor {
 		for(DuelsPlayer opponentDp : e.getDuelsPlayers()) {
 			if(!opponentDp.getPlayer().equals(challenger)) {
 				Player opponent = opponentDp.getPlayer();
-				challenger.sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + opponent.getName() + " 1v1 duelsiin");
-				opponent.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut Duelsiin.");
+				challenger.sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + opponent.getName() + " " + e.getKit().getName() +" 1v1 duelsiin");
+				opponent.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut " + e.getKit().getName() + " duelsiin.");
 				
 				String commandString = "/duel accept " + challenger.getName();
 				

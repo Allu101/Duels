@@ -1,6 +1,5 @@
 package com.allu.duels;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -211,7 +210,7 @@ public class DuelsGame implements CountDownTimerListener {
 			lobby.setKitItems(p, kit.getItems());
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
-			dp.getSidebarHandler().updateGameSidebar("1 vs 1");
+			dp.getSidebarHandler().updateGameSidebar(kit.getName());
 		}
 		timer.start(5, "Duelsin alkuun");
 	}
