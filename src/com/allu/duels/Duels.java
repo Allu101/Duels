@@ -9,7 +9,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,7 +25,7 @@ import com.allu.minigameapi.ItemHelpper;
 import com.allu.minigameapi.MessageHandler;
 import com.allu.minigameapi.ranking.SimpleRanking;
 
-public class Duels extends JavaPlugin {
+public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	public static Duels plugin;
 	
@@ -65,6 +70,8 @@ public class Duels extends JavaPlugin {
 		this.getCommand("duel").setExecutor(events);
 		this.getCommand("spectate").setExecutor(events);
 		this.getCommand("lobby").setExecutor(events);
+		
+		this.getCommand("duels").setExecutor(this);
 		
 	    loadKitsFromConfig();
 		createGames(Gamemode.DUELS_1V1);
@@ -122,13 +129,34 @@ public class Duels extends JavaPlugin {
 	}
 	
 	private void loadKitsFromConfig() {
+		
 		for (String key : config.getConfigurationSection("kits").getKeys(false)) {	
 			String kitPath = "kits." + key;
 			List<ItemStack> kitItems = new ArrayList<>();
 			
 			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
-				kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(kitPath + ".items." + item)));
+				
+				String itemPath = kitPath + ".items." + item;
+				
+				if (!config.isConfigurationSection(itemPath)) {
+					kitItems.add(new ItemStack(Material.getMaterial(item), config.getInt(itemPath, 1)));
+				}
+				else {
+					
+					ItemStack is = new ItemStack(Material.getMaterial(item), config.getInt(itemPath + ".amount", 1));
+					
+					String enchantmentsPath = itemPath + ".enchantments";
+					if (config.isConfigurationSection(enchantmentsPath)) {
+						for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
+							is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
+						}
+					}
+					
+					kitItems.add(is);
+				}
 			}
+			
+			
 			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), config.getString(kitPath + ".name") + " Duel"
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
 			Kit kit = new Kit(kitMenuItem, kitItems, key);
@@ -136,4 +164,24 @@ public class Duels extends JavaPlugin {
 			kits.add(kit);
 		}
 	}
+	
+	
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+		
+		if(cmd.getName().equalsIgnoreCase("duels") && args.length == 1 && args[0].equals("reload")) {
+			this.kits.clear();
+			this.loadKitsFromConfig();
+			sender.sendMessage("§aKits have been reloaded!");
+		}
+		return true;
+	}
 }
+
+
+
+
+
+
+

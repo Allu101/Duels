@@ -17,4 +17,8 @@ commands:
       description: return to lobby
       usage: /<command>
       aliases: []
+    duels:
+      description: plugin command
+      usage: /<command>
+      aliases: []
       
