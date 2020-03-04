@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import com.allu.duels.utils.FileHandler;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
@@ -193,6 +194,7 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 		
 		currentGameState = GameState.STARTING;
+		FileHandler.increaceKitPlayedCount(kit.getName());
 		players.clear();
 		for (DuelsPlayer dp : dplayers) {
 			players.add(dp);
