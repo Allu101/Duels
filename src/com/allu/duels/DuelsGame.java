@@ -148,7 +148,6 @@ public class DuelsGame implements CountDownTimerListener {
 				dp.setEloScore(dp.getEloScore() + finalEloChange);
 			}
 			
-			
 			Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
 		}
 		
@@ -158,13 +157,9 @@ public class DuelsGame implements CountDownTimerListener {
 		timer.start(5, "");
 	}
 	
-	
-	
 	private double getExpectedScore(int eloOwn, int eloOther) {
 		return 1.0 / (1.0 + Math.pow(10, (eloOther - eloOwn) / 400.0));
 	}
-
-	
 	
 	public Gamemode getGamemode() {
 		return gameMode;

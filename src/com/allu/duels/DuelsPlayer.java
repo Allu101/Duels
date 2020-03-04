@@ -3,7 +3,7 @@ package com.allu.duels;
 import org.bukkit.entity.Player;
 
 public class DuelsPlayer {
-	
+
 	private Player player;
 	private DuelsPlayer challengedPlayer;
 	private DuelsGame gameWhereJoined = null;
@@ -114,4 +114,28 @@ public class DuelsPlayer {
 		this.eloScore = score;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((player == null) ? 0 : player.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DuelsPlayer other = (DuelsPlayer) obj;
+		if (player == null) {
+			if (other.player != null)
+				return false;
+		} else if (!player.getUniqueId().toString().equals(other.player.getUniqueId().toString()))
+			return false;
+		return true;
+	}
 }
