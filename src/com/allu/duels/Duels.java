@@ -30,8 +30,6 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	public DatabaseHandler dbHandler = new DatabaseHandler(this);
 	
-	
-	
 	private static String LOBBY_WORLD;
 	private FileConfiguration config = this.getConfig();
 	private ArrayList<Kit> kits = new ArrayList<>();
@@ -39,22 +37,15 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	private Events events;
 	private ItemHelpper itemHelpper = new ItemHelpper();
 	private Lobby lobby;
-	private MenuHandler menuHandler;
-	
+	private MenuHandler menuHandler;	
 	
 	private SimpleRanking winsRanking;
-	private SimpleRanking eloRanking;
-	
-
-	
-	
+	private SimpleRanking eloRanking;	
 	
 	@Override
     public void onEnable() {
 		plugin = this;
 		this.saveDefaultConfig();
-		config.options().copyDefaults(true);
-	    saveConfig();
 	    
 	    winsRanking = new SimpleRanking(dbHandler.loadTop10PlayersToWinsScoreboard());
 	    eloRanking = new SimpleRanking(dbHandler.loadTop10PlayersToEloScoreScoreboard());
@@ -128,19 +119,15 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		return new Location(Bukkit.getWorld(world), x + 0.5, y, z + 0.5, yaw, 0);
 	}
 	
-	private void loadKitsFromConfig() {
-		
+	private void loadKitsFromConfig() {	
 		for (String key : config.getConfigurationSection("kits").getKeys(false)) {	
 			String kitPath = "kits." + key;
 			List<ItemStack> kitItems = new ArrayList<>();
 			
-			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {
+			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {				
+				String itemPath = kitPath + ".items." + item;	
 				
-				String itemPath = kitPath + ".items." + item;
-				
-				
-				if (!config.isConfigurationSection(itemPath)) {
-					
+				if (!config.isConfigurationSection(itemPath)) {			
 					Material mat = Material.STONE;
 					if (Material.getMaterial(item) != null) {
 						mat = Material.getMaterial(item);
@@ -152,11 +139,8 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 					if (is != null)
 						kitItems.add(is);
 				}
-				else {
-					
-					ItemStack is = new ItemStack(Material.getMaterial(item), config.getInt(itemPath + ".amount", 1));
-					
-					
+				else {			
+					ItemStack is = new ItemStack(Material.getMaterial(item), config.getInt(itemPath + ".amount", 1));			
 					if (is != null) {
 						String enchantmentsPath = itemPath + ".enchantments";
 						if (config.isConfigurationSection(enchantmentsPath)) {
@@ -173,17 +157,13 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			String kitName = config.getString(kitPath + ".name") + " Duel";
 			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), kitName
 					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
-			Kit kit = new Kit(kitMenuItem, kitItems, kitName);
-			
+			Kit kit = new Kit(kitMenuItem, kitItems, kitName);		
 			kits.add(kit);
 		}
 	}
 	
-	
-	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {	
 		if(cmd.getName().equalsIgnoreCase("duelsreload")) {
 			this.reloadConfig();
 			this.kits.clear();
