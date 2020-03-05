@@ -8,12 +8,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import com.allu.duels.utils.FileHandler;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
@@ -149,7 +149,6 @@ public class DuelsGame implements CountDownTimerListener {
 				dp.setEloScore(dp.getEloScore() + finalEloChange);
 			}
 			
-			
 			Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
 		}
 		
@@ -159,13 +158,9 @@ public class DuelsGame implements CountDownTimerListener {
 		timer.start(5, "");
 	}
 	
-	
-	
 	private double getExpectedScore(int eloOwn, int eloOther) {
 		return 1.0 / (1.0 + Math.pow(10, (eloOther - eloOwn) / 400.0));
 	}
-
-	
 	
 	public Gamemode getGamemode() {
 		return gameMode;
@@ -199,6 +194,7 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 		
 		currentGameState = GameState.STARTING;
+		FileHandler.increaceKitPlayedCount(kit.getName());
 		players.clear();
 		for (DuelsPlayer dp : dplayers) {
 			players.add(dp);
