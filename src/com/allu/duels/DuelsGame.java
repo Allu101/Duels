@@ -250,6 +250,10 @@ public class DuelsGame implements CountDownTimerListener {
 		return true;
 	}
 	
+	public boolean isNearArenaFloorLevel(double y) {
+		return Math.abs(y - this.arenaCenterLoc.getY()) < 1.5;
+	}
+	
 	public boolean isUnderArena(Location loc) {
 		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld())) {
 			return false;

@@ -308,7 +308,7 @@ public class Events implements Listener, CommandExecutor {
 		}
 		
 		// Checks if player is under arena. The player is announced as being dead.
-		if (gameWhereJoined.isUnderArena(damaged.getLocation()) || !gameWhereJoined.isWithinArena(damaged.getLocation())) {
+		if (gameWhereJoined.isUnderArena(damaged.getLocation())) {
 			e.setCancelled(true);
 			gameWhereJoined.onPlayerDie(damaged);
 		}
@@ -403,7 +403,8 @@ public class Events implements Listener, CommandExecutor {
 
 			DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
 			
-			if (gameWhereJoined != null && !gameWhereJoined.isWithinArena(e.getTo())) {
+			if (gameWhereJoined != null &&
+					(!gameWhereJoined.isWithinArena(e.getTo()) || !gameWhereJoined.isNearArenaFloorLevel(e.getTo().getY()))) {
 				e.setCancelled(true);
 				p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
 			} else {
