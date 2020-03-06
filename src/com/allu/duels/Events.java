@@ -1,7 +1,5 @@
 package com.allu.duels;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,12 +29,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-
 import com.allu.duels.utils.Gamemode;
-import com.allu.duels.utils.Kit;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class Events implements Listener, CommandExecutor {
 	
@@ -59,6 +53,11 @@ public class Events implements Listener, CommandExecutor {
 		DuelsPlayer dp = lobby.getDuelsPlayer(p);
 		
 		if(cmd.getName().equalsIgnoreCase("duel")) {
+			
+			if (dp.getGameWhereJoined() != null) {
+				p.sendMessage("&cEt voi tehdä tätä, kun olet pelissä!");
+				return true;
+			}
 			
 			if (args.length == 0) {
 				lobby.addPlayerToRankedQueue(p);
@@ -101,22 +100,22 @@ public class Events implements Listener, CommandExecutor {
 						p.sendMessage(ChatColor.RED + "Et voi hyväksyä omaa haastettasi.");
 						return true;
 					}
-					for(Challenge e : new ArrayList<Challenge>(challenges)) {
-						List<DuelsPlayer> challengePlayers = e.getDuelsPlayers();
-						if(e.getChallengerDp().getPlayer().equals(player) && challengePlayers.contains(dp)) {
-							DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
-							if(game != null) {
-								game.startGame(challengePlayers, e.getKit(), DuelsGame.GameType.FRIEND_CHALLENGE);
-								challenges.remove(e);
-								removeChallenges(challengePlayers.toArray(new DuelsPlayer[2]));
-								return true;
-							} else {
-								p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
-								return true;
-							}
-						}
+					
+					Challenge challenge = lobby.getChallenge(player, p);
+					
+					if (challenge == null) {
+						p.sendMessage(ChatColor.GRAY + "Haaste, jota koitat hyväksyä ei ole voimassa.");
+						return true;
 					}
-					p.sendMessage(ChatColor.GRAY + "Kukaan ei ole lähettänyt sinulle duels pyyntöä.");
+					
+					DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
+					
+					if(game == null) {
+						p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
+					} else {
+						game.startGame(challenge.getDuelsPlayers(), challenge.getKit(), DuelsGame.GameType.FRIEND_CHALLENGE);
+						lobby.removeChallengesWithPlayers(challenge.getDuelsPlayers().toArray(new DuelsPlayer[2]));
+					}
 					return true;
 				}
 			}
@@ -181,16 +180,6 @@ public class Events implements Listener, CommandExecutor {
 		}	
 		
 		return false;
-	}
-	
-	private void removeChallenges(DuelsPlayer... duelsPlayers) {
-		for(DuelsPlayer dp : duelsPlayers) {
-			for(Challenge e : new ArrayList<Challenge>(challenges)) {
-				if(e.getDuelsPlayers().contains(dp)) {
-					challenges.remove(e);
-				}
-			}
-		}
 	}
 	
 	@EventHandler
@@ -321,9 +310,18 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
+		
 		if (e.getPlayer().getInventory().getItemInHand().equals(menuHandler.getQueueItem())) {
-			removeChallenges(lobby.getDuelsPlayer(e.getPlayer()));
-			lobby.addPlayerToRankedQueue(e.getPlayer());
+			
+			DuelsPlayer dpp = lobby.getDuelsPlayer(e.getPlayer());
+			
+			if (dpp.getGameWhereJoined() == null) {
+				lobby.removeChallengesWithPlayers(lobby.getDuelsPlayer(e.getPlayer()));
+				lobby.addPlayerToRankedQueue(e.getPlayer());
+			} else {
+				e.getPlayer().sendMessage("§cOlet jo pelissä!");
+			}
+
 		}
 		//menuHandler.onPlayerInteract(e.getPlayer().getInventory().getItemInHand(), e.getAction());
 	}

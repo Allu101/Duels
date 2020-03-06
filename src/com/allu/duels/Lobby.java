@@ -89,10 +89,30 @@ public class Lobby {
 		challenges.add(new Challenge(challenger, challenged, kit));
 	}
 	
-	private void removeChallengesWithPlayers(DuelsPlayer... players) {
+	/**
+	 * Removes all challenges from the challenges list which contain any of the given players.
+	 * @param players
+	 */
+	public void removeChallengesWithPlayers(DuelsPlayer... players) {
 		for (DuelsPlayer dpp : players) {
-			this.challenges.removeIf(c -> c.getChallenger().equals(dpp) || c.getChallenged().equals(dpp));
+			this.challenges.removeIf(c -> c.hasPlayer(dpp));
 		}
+	}
+	
+	/**
+	 * If a challenge exists for given players, returns it.
+	 * Otherwise returns null.
+	 * @param challenger
+	 * @param challenged
+	 * @return
+	 */
+	public Challenge getChallenge(Player challenger, Player challenged) {
+		for (Challenge challenge : this.challenges) {
+			if (challenge.getChallenger().getPlayer().equals(challenger) && challenge.getChallenged().getPlayer().equals(challenged)) {
+				return challenge;
+			}
+		}
+		return null;
 	}
 	
 	private void sendChallengeMessage(Player challenged, Player challenger, Kit kit) {
@@ -223,8 +243,7 @@ public class Lobby {
 						duelsPlayers.add(dpp);
 						duelsPlayers.add(dpOpponent);
 						game.startGame(duelsPlayers, Duels.plugin.getKitByName("op duel"), DuelsGame.GameType.RANKED);
-						dpOpponent.setChallengedPlayer(null);
-						dpp.setChallengedPlayer(null);
+						this.rankedQueue.remove(opponent);
 						return;
 					} else {
 						p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");

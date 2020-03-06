@@ -2,7 +2,6 @@ package com.allu.duels;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -16,9 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import com.allu.duels.utils.DatabaseHandler;
-import com.allu.duels.utils.FileHandler;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.ItemHelpper;
@@ -56,7 +53,6 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		menuHandler = new MenuHandler(this, itemHelpper);
 		lobby = new Lobby(config, menuHandler);
 		events = new Events(lobby, menuHandler);
-		FileHandler fileHandler = new FileHandler();
 		
 		getServer().getPluginManager().registerEvents(events, this);
 		this.getCommand("duel").setExecutor(events);

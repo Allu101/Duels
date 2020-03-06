@@ -3,10 +3,6 @@ package com.allu.duels;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-
 import com.allu.duels.utils.Kit;
 
 public final class Challenge {
@@ -39,5 +35,9 @@ public final class Challenge {
 	
 	public DuelsPlayer getChallenged() {
 		return challenged;
+	}
+	
+	public boolean hasPlayer(DuelsPlayer player) {
+		return this.players.contains(player);
 	}
 }
