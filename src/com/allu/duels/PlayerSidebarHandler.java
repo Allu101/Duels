@@ -12,11 +12,11 @@ public class PlayerSidebarHandler {
 	private String header = ChatColor.BLUE + "" + ChatColor.BOLD + " Duels ";
 	private String netAddress_row = ChatColor.GOLD + "www.slinkoncraft.net";
 	
-	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows("", ""));
+	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows("", "", ""));
 	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	
 	public PlayerSidebarHandler() {
-		gameSidebar.updateSidebar(getGameSidebarRows("", ""));
+		gameSidebar.updateSidebar(getGameSidebarRows("", "", "")); // Is this necessary? -Ziigur
 	}
 	
 	public Scoreboard getGameBoard() {
@@ -27,22 +27,25 @@ public class PlayerSidebarHandler {
 		return lobbySidebar.getBoard();
 	}
 
-	public void updateGameSidebar(String gameType, String duelsMode) {
-		gameSidebar.updateSidebar(getGameSidebarRows(gameType, duelsMode));
+	public void updateGameSidebar(String gameType, String kitName, String opponentName) {
+		gameSidebar.updateSidebar(getGameSidebarRows(gameType, kitName, opponentName));
 	}
 	
 	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
 		lobbySidebar.updateSidebar(getLobbySidebarRows(wins, currentWinStreak, bestWinStreak, playedGames, eloScore));
 	}
 	
-	private ArrayList<String> getGameSidebarRows(String gameType, String duelsMode) {
+	private ArrayList<String> getGameSidebarRows(String gameType, String kitName, String opponentName) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
-		rows.add(ChatColor.WHITE + "Tyyppi:");
-		rows.add(gameType);
+		rows.add("§f§lTyyppi:");
+		rows.add(ChatColor.GRAY + gameType);
 		rows.add("");
-		rows.add(ChatColor.WHITE + "Mode:");
-		rows.add(ChatColor.GRAY + duelsMode);
+		rows.add("§a§lKit:");
+		rows.add(ChatColor.GRAY + kitName);
+		rows.add("");
+		rows.add("§d§lVastustaja:");
+		rows.add(ChatColor.GRAY + opponentName);
 		rows.add("");
 		rows.add(netAddress_row);
 		return rows;
@@ -51,20 +54,14 @@ public class PlayerSidebarHandler {
 	private ArrayList<String> getLobbySidebarRows(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
-		String totalWins_row = ChatColor.GRAY + "Voittoja: " + ChatColor.GOLD + wins;
-		String rankingRow = ChatColor.GRAY + "Rankingpisteet: " + ChatColor.GOLD + eloScore;
-		String bestWinStreak_row = ChatColor.GRAY + "Parhain voittoputki: " + ChatColor.GOLD + bestWinStreak;
-		String currentWinStreak_row = ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak;
-		String playedGamesRow = ChatColor.GRAY + "Pelatut pelit: " + ChatColor.GOLD + playedGames;
-		
 		rows.add("");
-		rows.add(totalWins_row);
-		rows.add(rankingRow);
+		rows.add(ChatColor.GRAY + "Voittoja: " + ChatColor.GOLD + wins);
+		rows.add(ChatColor.GRAY + "Rankingpisteet: " + ChatColor.GOLD + eloScore);
 		rows.add("");
-		rows.add(bestWinStreak_row);
-		rows.add(currentWinStreak_row);
+		rows.add(ChatColor.GRAY + "Parhain voittoputki: " + ChatColor.GOLD + bestWinStreak);
+		rows.add(ChatColor.GRAY + "Nykyinen voittoputki: " + ChatColor.GOLD + currentWinStreak);
 		rows.add("");
-		rows.add(playedGamesRow);
+		rows.add(ChatColor.GRAY + "Pelatut pelit: " + ChatColor.GOLD + playedGames);
 		rows.add("");
 		rows.add(netAddress_row);
 		return rows;

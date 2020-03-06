@@ -216,10 +216,15 @@ public class DuelsGame implements CountDownTimerListener {
 			lobby.setKitItems(p, kit.getItems());
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
-			dp.getSidebarHandler().updateGameSidebar(kit.getName(), getGameTypeString(this.gameType));
+			
+			DuelsPlayer opponent = this.getOtherPlayer(dp);
+			String opponentString = "";
+			if (opponent != null) opponentString = opponent.getPlayer().getName();
+			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(this.gameType), kit.getName(), opponentString);
 		}
 		timer.start(5, "Duelsin alkuun");
 	}
+	
 
 	private void getSpawn(Player p) {
 		for (int i = 0; i < players.size(); i++) {
@@ -239,6 +244,15 @@ public class DuelsGame implements CountDownTimerListener {
 				});
 			}
 		}
+	}
+	
+	private DuelsPlayer getOtherPlayer(DuelsPlayer dpp) {
+		for (DuelsPlayer dpp2: this.players) {
+			if (!dpp.equals(dpp2)) {
+				return dpp2;
+			}
+		}
+		return null;
 	}
 	
 	public boolean isWithinArena(Location loc) {
@@ -268,8 +282,8 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	private String getGameTypeString(GameType gameType) {
-		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "§a§lKaverihaaste";
-		if (gameType.equals(GameType.RANKED)) return "§c§lKilpailullinen";
+		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "Kaverihaaste";
+		if (gameType.equals(GameType.RANKED)) return "Kilpailullinen";
 		return "???";
 	}
 }
