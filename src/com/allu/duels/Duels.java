@@ -164,6 +164,19 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		}
 	}
 	
+	public Kit getKitByName(String kitName) {
+		for (Kit kit : this.kits) {
+			if (kit.getName().equalsIgnoreCase(kitName)) {
+				return kit;
+			}
+		}
+		return kits.get(0);
+	}
+	
+	public Lobby getLobby() {
+		return this.lobby;
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {	
 		if(cmd.getName().equalsIgnoreCase("duelsreload")) {

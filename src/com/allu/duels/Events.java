@@ -32,15 +32,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 
-import com.allu.duels.utils.ChallengeCreatedEvent;
 import com.allu.duels.utils.Gamemode;
+import com.allu.duels.utils.Kit;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class Events implements Listener, CommandExecutor {
-	
-	private List<ChallengeCreatedEvent> challenges = new ArrayList<ChallengeCreatedEvent>();
 	
 	private Lobby lobby;
 	private MenuHandler menuHandler;
@@ -62,7 +60,15 @@ public class Events implements Listener, CommandExecutor {
 		
 		if(cmd.getName().equalsIgnoreCase("duel")) {
 			
+			if (args.length == 0) {
+				lobby.addPlayerToRankedQueue(p);
+				return true;
+			}
+			
 			if(args.length == 1) {
+				
+				lobby.removePlayerFromRankedQueue(p);
+				
 				Player opponent = Bukkit.getPlayerExact(args[0].toString());
 				if(opponent == null) {
 					p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
@@ -95,14 +101,14 @@ public class Events implements Listener, CommandExecutor {
 						p.sendMessage(ChatColor.RED + "Et voi hyväksyä omaa haastettasi.");
 						return true;
 					}
-					for(ChallengeCreatedEvent e : new ArrayList<ChallengeCreatedEvent>(challenges)) {
+					for(Challenge e : new ArrayList<Challenge>(challenges)) {
 						List<DuelsPlayer> challengePlayers = e.getDuelsPlayers();
 						if(e.getChallengerDp().getPlayer().equals(player) && challengePlayers.contains(dp)) {
 							DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
 							if(game != null) {
-								game.startGame(challengePlayers, e.getKit());
+								game.startGame(challengePlayers, e.getKit(), DuelsGame.GameType.FRIEND_CHALLENGE);
 								challenges.remove(e);
-								removeChallenges(challengePlayers);
+								removeChallenges(challengePlayers.toArray(new DuelsPlayer[2]));
 								return true;
 							} else {
 								p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
@@ -177,9 +183,9 @@ public class Events implements Listener, CommandExecutor {
 		return false;
 	}
 	
-	private void removeChallenges(List<DuelsPlayer> duelsPlayers) {
+	private void removeChallenges(DuelsPlayer... duelsPlayers) {
 		for(DuelsPlayer dp : duelsPlayers) {
-			for(ChallengeCreatedEvent e : new ArrayList<ChallengeCreatedEvent>(challenges)) {
+			for(Challenge e : new ArrayList<Challenge>(challenges)) {
 				if(e.getDuelsPlayers().contains(dp)) {
 					challenges.remove(e);
 				}
@@ -212,41 +218,6 @@ public class Events implements Listener, CommandExecutor {
 		e.setCancelled(true);
 	}
 	
-	@EventHandler
-	public void onChallengeCreated(ChallengeCreatedEvent e) {
-		challenges.add(e);
-		Player challenger = e.getChallengerDp().getPlayer();
-		for(DuelsPlayer opponentDp : e.getDuelsPlayers()) {
-			if(!opponentDp.getPlayer().equals(challenger)) {
-				Player opponent = opponentDp.getPlayer();
-				challenger.sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + opponent.getName() + " " + e.getKit().getName() +" 1v1 duelsiin");
-				opponent.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut " + e.getKit().getName() + " duelsiin.");
-				
-				String commandString = "/duel accept " + challenger.getName();
-				
-				TextComponent msg1 = new TextComponent("Hyväksy haaste ");
-				msg1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
-				
-				TextComponent msg2 = new TextComponent("klikkaamalla");
-				msg2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
-				msg2.setColor(net.md_5.bungee.api.ChatColor.DARK_PURPLE);
-				msg2.setUnderlined(true);
-				
-				TextComponent msg3 = new TextComponent(" tai komennolla ");
-				msg3.setColor(net.md_5.bungee.api.ChatColor.GREEN);
-				
-				TextComponent msg4 = new TextComponent(commandString + ".");
-				msg4.setColor(net.md_5.bungee.api.ChatColor.BLUE);
-				
-				msg1.addExtra(msg2);
-				msg1.addExtra(msg3);
-				msg1.addExtra(msg4);
-				
-				
-				opponent.spigot().sendMessage(msg1);
-			}	
-		}
-	}
 	
 	@EventHandler
 	public void creatureSpawn(CreatureSpawnEvent e) {
@@ -350,7 +321,11 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
-		menuHandler.onPlayerInteract(e.getPlayer().getInventory().getItemInHand(), e.getAction());
+		if (e.getPlayer().getInventory().getItemInHand().equals(menuHandler.getQueueItem())) {
+			removeChallenges(lobby.getDuelsPlayer(e.getPlayer()));
+			lobby.addPlayerToRankedQueue(e.getPlayer());
+		}
+		//menuHandler.onPlayerInteract(e.getPlayer().getInventory().getItemInHand(), e.getAction());
 	}
 	
 	@EventHandler

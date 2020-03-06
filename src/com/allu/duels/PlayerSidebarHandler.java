@@ -12,11 +12,11 @@ public class PlayerSidebarHandler {
 	private String header = ChatColor.BLUE + "" + ChatColor.BOLD + " Duels ";
 	private String netAddress_row = ChatColor.GOLD + "www.slinkoncraft.net";
 	
-	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows(""));
+	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows("", ""));
 	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	
 	public PlayerSidebarHandler() {
-		gameSidebar.updateSidebar(getGameSidebarRows(""));
+		gameSidebar.updateSidebar(getGameSidebarRows("", ""));
 	}
 	
 	public Scoreboard getGameBoard() {
@@ -27,18 +27,22 @@ public class PlayerSidebarHandler {
 		return lobbySidebar.getBoard();
 	}
 
-	public void updateGameSidebar(String duelsMode) {
-		gameSidebar.updateSidebar(getGameSidebarRows(duelsMode));
+	public void updateGameSidebar(String gameType, String duelsMode) {
+		gameSidebar.updateSidebar(getGameSidebarRows(gameType, duelsMode));
 	}
 	
 	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
 		lobbySidebar.updateSidebar(getLobbySidebarRows(wins, currentWinStreak, bestWinStreak, playedGames, eloScore));
 	}
 	
-	private ArrayList<String> getGameSidebarRows(String duelsMode) {
+	private ArrayList<String> getGameSidebarRows(String gameType, String duelsMode) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
-		rows.add(ChatColor.WHITE + "Mode: " + ChatColor.GRAY + duelsMode);
+		rows.add(ChatColor.WHITE + "Tyyppi:");
+		rows.add(gameType);
+		rows.add("");
+		rows.add(ChatColor.WHITE + "Mode:");
+		rows.add(ChatColor.GRAY + duelsMode);
 		rows.add("");
 		rows.add(netAddress_row);
 		return rows;

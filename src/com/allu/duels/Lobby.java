@@ -14,8 +14,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.allu.duels.utils.Gamemode;
+import com.allu.duels.utils.Kit;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class Lobby {
 	
@@ -23,9 +26,14 @@ public class Lobby {
 	
 	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	private ArrayList<DuelsGame> games = new ArrayList<DuelsGame>();
+	private ArrayList<Challenge> challenges = new ArrayList<Challenge>();
+	
 	private Location spawnLocation;
 	
 	private MenuHandler menuHandler;
+	
+	private ArrayList<Player> rankedQueue = new ArrayList<>();
+	
 
 	public Lobby(FileConfiguration config, MenuHandler menuHandler) {
 		spawnLocation = new Location(Bukkit.getWorld(config.getString("lobbyworldname")), config.getDouble("spawnloc.x"), config.getDouble("spawnloc.y"), config.getDouble("spawnloc.z"), 
@@ -70,6 +78,49 @@ public class Lobby {
 	
 	public void onPlayerLeave(DuelsPlayer dp) {
 		players.remove(dp);
+	}
+	
+	public void createNewChallenge(DuelsPlayer challenger, DuelsPlayer challenged, Kit kit) {
+		
+		Player challengedPlayer = challenged.getPlayer();
+		challenger.getPlayer().sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + challengedPlayer.getName() + " " + kit.getName() +" 1v1 duelsiin");
+		sendChallengeMessage(challengedPlayer, challenger.getPlayer(), kit);
+		
+		challenges.add(new Challenge(challenger, challenged, kit));
+	}
+	
+	private void removeChallengesWithPlayers(DuelsPlayer... players) {
+		for (DuelsPlayer dpp : players) {
+			this.challenges.removeIf(c -> c.getChallenger().equals(dpp) || c.getChallenged().equals(dpp));
+		}
+	}
+	
+	private void sendChallengeMessage(Player challenged, Player challenger, Kit kit) {
+		
+		challenged.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut " + kit.getName() + " duelsiin.");
+		
+		String commandString = "/duel accept " + challenger.getName();
+		
+		TextComponent msg1 = new TextComponent("Hyväksy haaste ");
+		msg1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+		
+		TextComponent msg2 = new TextComponent("klikkaamalla");
+		msg2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
+		msg2.setColor(net.md_5.bungee.api.ChatColor.DARK_PURPLE);
+		msg2.setUnderlined(true);
+		
+		TextComponent msg3 = new TextComponent(" tai komennolla ");
+		msg3.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+		
+		TextComponent msg4 = new TextComponent(commandString + ".");
+		msg4.setColor(net.md_5.bungee.api.ChatColor.BLUE);
+		
+		msg1.addExtra(msg2);
+		msg1.addExtra(msg3);
+		msg1.addExtra(msg4);
+		
+		
+		challenged.spigot().sendMessage(msg1);
 	}
 	
 	/**
@@ -149,5 +200,49 @@ public class Lobby {
 		for(PotionEffect effect : p.getActivePotionEffects()) {
 		    p.removePotionEffect(effect.getType());
 		}
+	}
+	
+	public void addPlayerToRankedQueue(Player p) {
+		
+		DuelsPlayer dpp = getDuelsPlayer(p);
+		
+		if (this.rankedQueue.size() > 0) {
+			
+			if (this.rankedQueue.contains(p)) {
+				p.sendMessage("§cOlet jo jonossa!");
+				return;
+			} else {
+				Player opponent = rankedQueue.get(0);
+				
+				if (opponent.isOnline()) {
+					DuelsPlayer dpOpponent = getDuelsPlayer(opponent);
+					
+					DuelsGame game = getFreeGame(Gamemode.DUELS_1V1);
+					if(game != null) {
+						List<DuelsPlayer> duelsPlayers = new ArrayList<DuelsPlayer>();
+						duelsPlayers.add(dpp);
+						duelsPlayers.add(dpOpponent);
+						game.startGame(duelsPlayers, Duels.plugin.getKitByName("op duel"), DuelsGame.GameType.RANKED);
+						dpOpponent.setChallengedPlayer(null);
+						dpp.setChallengedPlayer(null);
+						return;
+					} else {
+						p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
+						return;
+					}
+					
+				} else {
+					this.rankedQueue.remove(opponent);
+				}
+			}
+		}
+		
+		this.rankedQueue.add(p);
+		p.sendMessage("§aOdotat nyt vastustajaa peliin!");
+		dpp.setChallengedPlayer(null);
+	}
+	
+	public void removePlayerFromRankedQueue(Player p) {
+		this.rankedQueue.remove(p);
 	}
 }

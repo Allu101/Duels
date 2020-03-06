@@ -23,12 +23,19 @@ import com.allu.minigameapi.ranking.SimpleRanking;
 
 public class DuelsGame implements CountDownTimerListener {
 
+	public enum GameType {
+		RANKED, FRIEND_CHALLENGE
+	}
+	
+	
 	private enum GameState {
 		FREE, STARTING, PLAYING, GAME_FINISH
 	}
+	
 
 	private GameState currentGameState = GameState.FREE;
 	private Gamemode gameMode;
+	private GameType gameType;
 
 	private ArrayList<Location> buildedBlocks = new ArrayList<Location>();
 	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
@@ -185,7 +192,10 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 	}
 
-	public void startGame(List<DuelsPlayer> dplayers, Kit kit) {
+	public void startGame(List<DuelsPlayer> dplayers, Kit kit, GameType gameType) {
+		
+		this.gameType = gameType;
+		
 		for (Entity entity : spawn1.getWorld().getEntities()) {
 			EntityType eType = entity.getType();
 			if(eType.equals(EntityType.ARROW) && isWithinArena(entity.getLocation())) {
@@ -206,7 +216,7 @@ public class DuelsGame implements CountDownTimerListener {
 			lobby.setKitItems(p, kit.getItems());
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
-			dp.getSidebarHandler().updateGameSidebar(kit.getName());
+			dp.getSidebarHandler().updateGameSidebar(kit.getName(), getGameTypeString(this.gameType));
 		}
 		timer.start(5, "Duelsin alkuun");
 	}
@@ -255,5 +265,11 @@ public class DuelsGame implements CountDownTimerListener {
 			return false;
 		}
 		return loc.getBlockY() < this.arenaCenterLoc.getBlockY() - 4;
+	}
+	
+	private String getGameTypeString(GameType gameType) {
+		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "§a§lKaverihaaste";
+		if (gameType.equals(GameType.RANKED)) return "§c§lKilpailullinen";
+		return "???";
 	}
 }
