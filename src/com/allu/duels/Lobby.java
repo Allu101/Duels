@@ -10,7 +10,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import com.allu.duels.utils.Gamemode;
@@ -184,29 +183,6 @@ public class Lobby {
 		menuHandler.setLobbyItems(p);
 	}
 	
-	public void setKitItems(Player p, List<ItemStack> items) {
-		p.getInventory().clear();
-		for (ItemStack is : items) {
-			String itemTypeString = is.getType().toString();
-			if (itemTypeString.contains("HELMET")) {
-				p.getInventory().setHelmet(new ItemStack(is));
-			}
-			else if (itemTypeString.contains("LEGGINGS")) {
-				p.getInventory().setLeggings(new ItemStack(is));
-			}
-			else if (itemTypeString.contains("CHESTPLATE")) {
-				p.getInventory().setChestplate(new ItemStack(is));
-			}
-			else if (itemTypeString.contains("_BOOTS")) {
-				p.getInventory().setBoots(new ItemStack(is));
-			}
-			else {
-				p.getInventory().addItem(new ItemStack(is));
-			}
-		}
-		
-		p.updateInventory();
-	}
 	
 	public void clearPlayerInventoryAndEquipment(Player player) {
 		player.getInventory().clear();

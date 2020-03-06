@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
 
 import com.allu.duels.utils.FileHandler;
 import com.allu.duels.utils.Gamemode;
@@ -206,14 +207,17 @@ public class DuelsGame implements CountDownTimerListener {
 		currentGameState = GameState.STARTING;
 		FileHandler.increaceKitPlayedCount(kit.getName());
 		players.clear();
+		
 		for (DuelsPlayer dp : dplayers) {
+			
 			players.add(dp);
-			Player p = dp.getPlayer();
 			dp.setGameWhereJoined(this);
+			
+			Player p = dp.getPlayer();
+			
 			timer.addPlayer(p);
 			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 			getSpawn(p);
-			lobby.setKitItems(p, kit.getItems());
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
 			
@@ -221,8 +225,42 @@ public class DuelsGame implements CountDownTimerListener {
 			String opponentString = "";
 			if (opponent != null) opponentString = opponent.getPlayer().getName();
 			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(this.gameType), kit.getName(), opponentString);
+			
+			p.getInventory().clear();
+			p.updateInventory();
+			
+			Bukkit.getScheduler().runTaskLater(Duels.plugin, new Runnable() {
+				@Override
+				public void run() {
+					setKitItems(p, kit.getItems());
+				}
+			}, 10);
 		}
-		timer.start(5, "Duelsin alkuun");
+		timer.start(3, "Duelsin alkuun");
+	}
+	
+	private void setKitItems(Player p, List<ItemStack> items) {
+		
+		for (ItemStack is : items) {
+			String itemTypeString = is.getType().toString();
+			if (itemTypeString.contains("HELMET")) {
+				p.getInventory().setHelmet(new ItemStack(is));
+			}
+			else if (itemTypeString.contains("LEGGINGS")) {
+				p.getInventory().setLeggings(new ItemStack(is));
+			}
+			else if (itemTypeString.contains("CHESTPLATE")) {
+				p.getInventory().setChestplate(new ItemStack(is));
+			}
+			else if (itemTypeString.contains("_BOOTS")) {
+				p.getInventory().setBoots(new ItemStack(is));
+			}
+			else {
+				p.getInventory().addItem(new ItemStack(is));
+			}
+		}
+		
+		p.updateInventory();
 	}
 	
 
