@@ -38,8 +38,8 @@ public class DuelsGame implements CountDownTimerListener {
 	private Gamemode gameMode;
 	private GameType gameType;
 
-	private ArrayList<Location> buildedBlocks = new ArrayList<Location>();
-	private ArrayList<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
+	private List<Location> buildedBlocks = new ArrayList<Location>();
+	private List<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
 	private Location arenaCenterLoc, spawn1, spawn2;
 
 	private Lobby lobby;
@@ -174,7 +174,7 @@ public class DuelsGame implements CountDownTimerListener {
 		return gameMode;
 	}
 
-	public ArrayList<Location> getPlacedBlocks() {
+	public List<Location> getPlacedBlocks() {
 		return buildedBlocks;
 	}
 
@@ -194,7 +194,7 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit, GameType gameType) {
-		
+		this.players = dplayers;
 		this.gameType = gameType;
 		
 		for (Entity entity : spawn1.getWorld().getEntities()) {
@@ -206,11 +206,8 @@ public class DuelsGame implements CountDownTimerListener {
 		
 		currentGameState = GameState.STARTING;
 		FileHandler.increaceKitPlayedCount(kit.getName());
-		players.clear();
 		
 		for (DuelsPlayer dp : dplayers) {
-			
-			players.add(dp);
 			dp.setGameWhereJoined(this);
 			
 			Player p = dp.getPlayer();
@@ -223,7 +220,9 @@ public class DuelsGame implements CountDownTimerListener {
 			
 			DuelsPlayer opponent = this.getOtherPlayer(dp);
 			String opponentString = "";
-			if (opponent != null) opponentString = opponent.getPlayer().getName();
+			if (opponent != null) {
+				opponentString = opponent.getPlayer().getName();
+			}
 			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(this.gameType), kit.getName(), opponentString);
 			
 			p.getInventory().clear();
