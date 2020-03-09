@@ -319,12 +319,19 @@ public class Events implements Listener, CommandExecutor {
 			if (dpp.getGameWhereJoined() == null) {
 				lobby.removeChallengesWithPlayers(lobby.getDuelsPlayer(e.getPlayer()));
 				lobby.addPlayerToRankedQueue(e.getPlayer());
+				
 			} else {
 				e.getPlayer().sendMessage("§cOlet jo pelissä!");
 			}
-
 		}
-		//menuHandler.onPlayerInteract(e.getPlayer().getInventory().getItemInHand(), e.getAction());
+		else if (e.getPlayer().getInventory().getItemInHand().equals(menuHandler.getExitQueueItem())) {
+			
+			DuelsPlayer dpp = lobby.getDuelsPlayer(e.getPlayer());
+			
+			if (dpp.getGameWhereJoined() == null) {
+				lobby.removePlayerFromRankedQueue(e.getPlayer());
+			}
+		}
 	}
 	
 	@EventHandler

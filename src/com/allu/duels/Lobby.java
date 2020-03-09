@@ -259,10 +259,12 @@ public class Lobby {
 		
 		this.rankedQueue.add(p);
 		p.sendMessage("§aOdotat nyt vastustajaa peliin!");
+		menuHandler.addExitQueueItemToPlayer(p);
 		dpp.setChallengedPlayer(null);
 	}
 	
 	public void removePlayerFromRankedQueue(Player p) {
 		this.rankedQueue.remove(p);
+		menuHandler.removeExitQueueItemFromPlayer(p);
 	}
 }
