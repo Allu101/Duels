@@ -81,11 +81,29 @@ public class Lobby {
 	
 	public void createNewChallenge(DuelsPlayer challenger, DuelsPlayer challenged, Kit kit) {
 		
+		Player challengerPlayer = challenger.getPlayer();
 		Player challengedPlayer = challenged.getPlayer();
-		challenger.getPlayer().sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + challengedPlayer.getName() + " " + kit.getName() +" 1v1 duelsiin");
-		sendChallengeMessage(challengedPlayer, challenger.getPlayer(), kit);
 		
-		challenges.add(new Challenge(challenger, challenged, kit));
+		Challenge existingChallenge = this.getChallenge(challengerPlayer, challengedPlayer);
+		
+		if (existingChallenge != null) {
+			long timePassed = System.currentTimeMillis() - existingChallenge.getChallengeSendTime();
+			
+			if (timePassed < 20000) { // 20 seconds
+				challengerPlayer.sendMessage(ChatColor.RED + "Odota hetki ennen uuden haasteen lähettämistä!");
+				return;
+			}
+		}
+		
+		// Let everyone challenge others only once. (No multiple challenges from one player to another at the same time.)
+		// New challenge will replace the old.
+		this.challenges.remove(existingChallenge);
+
+		Challenge challenge = new Challenge(challenger, challenged, kit);
+		challenges.add(challenge);
+		
+		challengerPlayer.sendMessage(ChatColor.AQUA + "Haastoit pelaajan " + challengedPlayer.getName() + " " + kit.getName() +" 1v1 duelsiin");
+		sendChallengeMessage(challenge);
 	}
 	
 	/**
@@ -114,30 +132,37 @@ public class Lobby {
 		return null;
 	}
 	
-	private void sendChallengeMessage(Player challenged, Player challenger, Kit kit) {
+	/**
+	 * Returns challenge by challengeID. Otherwise returns null.
+	 * @param challengeID
+	 * @return
+	 */
+	public Challenge getChallenge(long challengeID) {
+		for (Challenge challenge : this.challenges) {
+			if (challenge.getChallengeID() == challengeID) {
+				return challenge;
+			}
+		}
+		return null;
+	}
+	
+	private void sendChallengeMessage(Challenge challenge) {
 		
-		challenged.sendMessage(ChatColor.GREEN + challenger.getName() + " haastoi sinut " + kit.getName() + " duelsiin.");
+		Player challenged = challenge.getChallenged().getPlayer();
 		
-		String commandString = "/duel accept " + challenger.getName();
+		challenged.sendMessage(ChatColor.GREEN + challenge.getChallenger().getPlayer().getName() +
+				" haastoi sinut " + challenge.getKit().getName() + " duelsiin.");
 		
 		TextComponent msg1 = new TextComponent("Hyväksy haaste ");
 		msg1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
 		
-		TextComponent msg2 = new TextComponent("klikkaamalla");
-		msg2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandString));
+		TextComponent msg2 = new TextComponent("klikkaamalla tästä!");
+		msg2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+				"/duel accept " + challenge.getChallengeID()));
 		msg2.setColor(net.md_5.bungee.api.ChatColor.DARK_PURPLE);
 		msg2.setUnderlined(true);
 		
-		TextComponent msg3 = new TextComponent(" tai komennolla ");
-		msg3.setColor(net.md_5.bungee.api.ChatColor.GREEN);
-		
-		TextComponent msg4 = new TextComponent(commandString + ".");
-		msg4.setColor(net.md_5.bungee.api.ChatColor.BLUE);
-		
 		msg1.addExtra(msg2);
-		msg1.addExtra(msg3);
-		msg1.addExtra(msg4);
-		
 		
 		challenged.spigot().sendMessage(msg1);
 	}

@@ -91,19 +91,20 @@ public class Events implements Listener, CommandExecutor {
 			
 			if(args.length == 2) {
 				if(args[0].equalsIgnoreCase("accept")) {
-					Player player = Bukkit.getPlayerExact(args[1]);
-					if(player == null) {
-						p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
-						return true;
+					
+					long challengeID = 0;
+					try {
+						challengeID  = Long.parseLong(args[1]);
 					}
-					if(p.equals(player)) {
-						p.sendMessage(ChatColor.RED + "Et voi hyväksyä omaa haastettasi.");
+					catch (NumberFormatException e) {
+						p.sendMessage(ChatColor.RED + "Virheellinen komento!");
 						return true;
 					}
 					
-					Challenge challenge = lobby.getChallenge(player, p);
+					Challenge challenge = lobby.getChallenge(challengeID);
 					
-					if (challenge == null) {
+					// Return failure, if non exist, or not pointed to the player.
+					if (challenge == null || !challenge.getChallenged().getPlayer().equals(p)) {
 						p.sendMessage(ChatColor.GRAY + "Haaste, jota koitat hyväksyä ei ole voimassa.");
 						return true;
 					}
@@ -121,7 +122,7 @@ public class Events implements Listener, CommandExecutor {
 			}
 			p.sendMessage(lobby.LINE);
 			p.sendMessage(ChatColor.AQUA + "/duel <pelaajan_nimi>");
-			p.sendMessage(ChatColor.AQUA + "/duel accept <pelaajan_nimi>.");
+			//p.sendMessage(ChatColor.AQUA + "/duel accept <pelaajan_nimi>.");
 			p.sendMessage(lobby.LINE);
 			return true;
 		}
