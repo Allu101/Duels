@@ -222,6 +222,8 @@ public class DuelsGame implements CountDownTimerListener {
 		currentGameState = GameState.STARTING;
 		FileHandler.increaceKitPlayedCount(kit.getName());
 		
+		teleportPlayersToSpawnPoints();
+		
 		for (DuelsPlayer dp : dplayers) {
 			dp.setGameWhereJoined(this);
 			
@@ -229,7 +231,6 @@ public class DuelsGame implements CountDownTimerListener {
 			
 			timer.addPlayer(p);
 			p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
-			getSpawn(p);
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
 			
@@ -250,6 +251,7 @@ public class DuelsGame implements CountDownTimerListener {
 				}
 			}, 10);
 		}
+		
 		timer.start(3, "Duelsin alkuun");
 	}
 	
@@ -278,22 +280,12 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 
-	private void getSpawn(Player p) {
+	private void teleportPlayersToSpawnPoints() {
 		for (int i = 0; i < players.size(); i++) {
 			if (i % 2 == 0) {
-				Bukkit.getScheduler().runTask(Duels.plugin, new Runnable() {
-					@Override
-					public void run() {
-						p.teleport(spawn1, TeleportCause.PLUGIN);
-					}
-				});
+				players.get(i).getPlayer().teleport(spawn1, TeleportCause.PLUGIN);
 			} else {
-				Bukkit.getScheduler().runTask(Duels.plugin, new Runnable() {
-					@Override
-					public void run() {
-						p.teleport(spawn2, TeleportCause.PLUGIN);
-					}
-				});
+				players.get(i).getPlayer().teleport(spawn2, TeleportCause.PLUGIN);
 			}
 		}
 	}
