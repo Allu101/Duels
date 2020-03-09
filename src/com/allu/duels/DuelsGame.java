@@ -162,11 +162,11 @@ public class DuelsGame implements CountDownTimerListener {
 				if (finalEloChange == 0) {
 					p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivät muuttuneet pelin tuloksena.");
 				}
-				else if (finalEloChange > 0) {
-					p.sendMessage(ChatColor.RED + "Menetit " + eloChange + " ranking-pistettä");
-				}
 				else if (finalEloChange < 0) {
-					p.sendMessage(ChatColor.GREEN + "Sait " + eloChange + " ranking-pistettä!");
+					p.sendMessage(ChatColor.RED + "Menetit " + finalEloChange + " ranking-pistettä");
+				}
+				else if (finalEloChange > 0) {
+					p.sendMessage(ChatColor.GREEN + "Sait " + finalEloChange + " ranking-pistettä!");
 					p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0f);
 				}
 			}
