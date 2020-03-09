@@ -70,7 +70,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		winsRanking.addFloatingRankingList(new Location(world, 5.5, 11, -37.5),
 				"" + ChatColor.BLUE + ChatColor.BOLD + "- Voitot -", ChatColor.BLUE, ChatColor.GREEN);	
 		eloRanking.addFloatingRankingList(new Location(world, 27.5, 11, -15.5),
-				"" + ChatColor.BLUE + ChatColor.BOLD + "- Rankingpisteet -", ChatColor.BLUE, ChatColor.GREEN);	
+				"" + ChatColor.BLUE + ChatColor.BOLD + "- Ranking-pisteet -", ChatColor.BLUE, ChatColor.GREEN);	
 	}
 	
 	@Override
