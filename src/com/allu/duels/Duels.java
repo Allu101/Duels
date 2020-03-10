@@ -14,7 +14,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+
 import com.allu.duels.utils.DatabaseHandler;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
@@ -130,21 +135,36 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 					if (Material.getMaterial(item) != null) {
 						mat = Material.getMaterial(item);
 					} else {
-						System.out.println("Error loadin: " + itemPath);
+						System.out.println("Error loading: " + itemPath);
 					}
 					ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
 					
 					if (is != null)
 						kitItems.add(is);
 				}
-				else {			
-					ItemStack is = new ItemStack(Material.getMaterial(item), config.getInt(itemPath + ".amount", 1));			
+				else {
+					
+					int amount = config.getInt(itemPath + ".amount", 1);
+					
+					ItemStack is = new ItemStack(Material.getMaterial(item), amount);			
 					if (is != null) {
+						
 						String enchantmentsPath = itemPath + ".enchantments";
 						if (config.isConfigurationSection(enchantmentsPath)) {
 							for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
 								is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
 							}
+						}
+						
+						String potionTypePath = itemPath + ".potionEffect";
+						if (config.isSet(potionTypePath)) {
+							
+							Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
+							if (config.getBoolean(itemPath + ".splash", false)) {
+								potion = potion.splash();
+							}
+							
+							is = potion.toItemStack(amount);
 						}
 						
 						kitItems.add(is);
