@@ -130,46 +130,53 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {				
 				String itemPath = kitPath + ".items." + item;	
 				
-				if (!config.isConfigurationSection(itemPath)) {			
-					Material mat = Material.STONE;
-					if (Material.getMaterial(item) != null) {
-						mat = Material.getMaterial(item);
+				
+				Material mat = Material.STONE;
+				if (Material.getMaterial(item) != null) {
+					mat = Material.getMaterial(item);
+				} else {
+					if (item.startsWith("potion")) {
+						mat = Material.POTION;
 					} else {
 						System.out.println("Error loading: " + itemPath);
 					}
-					ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
-					
-					if (is != null)
-						kitItems.add(is);
 				}
-				else {
+				
+				ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
+				
+				if (config.isConfigurationSection(itemPath)) {			
 					
-					int amount = config.getInt(itemPath + ".amount", 1);
+					is.setAmount(config.getInt(itemPath + ".amount", 1));
 					
-					ItemStack is = new ItemStack(Material.getMaterial(item), amount);			
-					if (is != null) {
+					if (Material.getMaterial(item) != null) {
+						mat = Material.getMaterial(item);
+					} else {
+						if (item.startsWith("potion")) {
+							mat = Material.POTION;
+						}
+					}
+					
 						
-						String enchantmentsPath = itemPath + ".enchantments";
-						if (config.isConfigurationSection(enchantmentsPath)) {
-							for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
-								is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
-							}
+					String enchantmentsPath = itemPath + ".enchantments";
+					if (config.isConfigurationSection(enchantmentsPath)) {
+						for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
+							is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
+						}
+					}
+					
+					String potionTypePath = itemPath + ".potionEffect";
+					if (config.isSet(potionTypePath)) {
+						
+						Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
+						if (config.getBoolean(itemPath + ".splash", false)) {
+							potion.setSplash(true);
 						}
 						
-						String potionTypePath = itemPath + ".potionEffect";
-						if (config.isSet(potionTypePath)) {
-							
-							Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
-							if (config.getBoolean(itemPath + ".splash", false)) {
-								potion = potion.splash();
-							}
-							
-							is = potion.toItemStack(amount);
-						}
-						
-						kitItems.add(is);
+						potion.apply(is);
 					}
 				}
+				
+				kitItems.add(is);
 			}
 			
 			String kitName = config.getString(kitPath + ".name") + " Duel";
@@ -200,6 +207,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			this.kits.clear();
 			this.loadKitsFromConfig();
 			sender.sendMessage("§aKits have been reloaded!");
+			sender.sendMessage("There are " + this.kits.size() + " kits.");
 		}
 		return true;
 	}
