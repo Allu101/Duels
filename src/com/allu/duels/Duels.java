@@ -13,6 +13,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,6 +66,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		this.getCommand("lobby").setExecutor(events);
 		
 		this.getCommand("duelsreload").setExecutor(this);
+		this.getCommand("kits").setExecutor(this);
 		
 	    loadKitsFromConfig();
 		createGames(Gamemode.DUELS_1V1);
@@ -179,10 +181,10 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 				kitItems.add(is);
 			}
 			
-			String kitName = config.getString(kitPath + ".name") + " Duel";
+			String kitName = "§9" + config.getString(kitPath + ".name") + " Duel";
 			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), kitName
-					, ChatColor.YELLOW + "Klikkaa liittyäksesi.");
-			Kit kit = new Kit(kitMenuItem, kitItems, kitName);		
+					, getKitMenuItemBodyText(kitItems));
+			Kit kit = new Kit(kitMenuItem, kitItems, kitName);
 			kits.add(kit);
 		}
 	}
@@ -194,6 +196,29 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			}
 		}
 		return kits.get(0);
+	}
+	
+	private String[] getKitMenuItemBodyText(List<ItemStack> items) {
+		
+		List<String> lines = new ArrayList<String>();
+		
+		lines.add("§r ");
+		lines.add("§fKitin sisältö:");
+		
+		for (ItemStack item : items) {
+			
+			int amount = item.getAmount();
+			
+			lines.add("§7" + amount + "x " + getItemNameString(item));
+		}
+		
+		return lines.toArray(new String[lines.size()]);
+	}
+	
+	private String getItemNameString(ItemStack item) {
+		String name = item.getType().toString().toLowerCase().replace('_', ' ');
+		name = name.substring(0, 1).toUpperCase() + name.substring(1);
+		return name;
 	}
 	
 	public Lobby getLobby() {
@@ -208,6 +233,17 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			this.loadKitsFromConfig();
 			sender.sendMessage("§aKits have been reloaded!");
 			sender.sendMessage("There are " + this.kits.size() + " kits.");
+		}
+		if(cmd.getName().equalsIgnoreCase("kits")) {
+			if (!(sender instanceof Player)) {
+				sender.sendMessage("Komento vain pelaajille!");
+				return true;
+			}
+			DuelsPlayer dp = lobby.getDuelsPlayer((Player)sender);
+			if (dp != null) {
+				dp.setChallengedPlayer(null);
+				((Player)sender).openInventory(this.menuHandler.createKitMenu());	
+			}
 		}
 		return true;
 	}

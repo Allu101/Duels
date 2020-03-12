@@ -23,4 +23,8 @@ commands:
       aliases: []
       permission: duels.admin
       permission-message: Sinulla ei ole oikeuksia tuohon!
+    kits:
+      description: plugin command
+      usage: /<command>
+      aliases: []
       
