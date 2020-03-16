@@ -64,7 +64,7 @@ public class MenuHandler {
 		p.getInventory().setItem(2, this.exitQueueItem);
 	}
 	public void removeExitQueueItemFromPlayer(Player p) {
-		p.getInventory().setItem(2, null);
+		p.getInventory().remove(this.exitQueueItem);
 	}
 	
 	public ItemStack getQueueItem() {

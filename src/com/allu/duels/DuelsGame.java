@@ -163,7 +163,7 @@ public class DuelsGame implements CountDownTimerListener {
 					p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivät muuttuneet pelin tuloksena.");
 				}
 				else if (finalEloChange < 0) {
-					p.sendMessage(ChatColor.RED + "Menetit " + finalEloChange + " ranking-pistettä");
+					p.sendMessage(ChatColor.RED + "Menetit " + (-finalEloChange) + " ranking-pistettä");
 				}
 				else if (finalEloChange > 0) {
 					p.sendMessage(ChatColor.GREEN + "Sait " + finalEloChange + " ranking-pistettä!");
@@ -209,18 +209,25 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit, GameType gameType) {
+		
+		currentGameState = GameState.STARTING;
+		
 		this.players = dplayers;
 		this.gameType = gameType;
 		
-		for (Entity entity : spawn1.getWorld().getEntities()) {
-			EntityType eType = entity.getType();
-			if(eType.equals(EntityType.ARROW) && isWithinArena(entity.getLocation())) {
-				entity.remove();
+		// Remove all the arrows from the arena.
+		Bukkit.getScheduler().runTaskLater(Duels.plugin, new Runnable() {
+			@Override
+			public void run() {
+				List<Entity> entities = arenaCenterLoc.getWorld().getEntities();
+				for (Entity entity : entities) {
+					EntityType eType = entity.getType();
+					if(eType.equals(EntityType.ARROW) && isWithinArena(entity.getLocation())) {
+						entity.remove();
+					}
+				}
 			}
-		}
-		
-		currentGameState = GameState.STARTING;
-		FileHandler.increaceKitPlayedCount(kit.getName());
+		}, 10);
 		
 		teleportPlayersToSpawnPoints();
 		
@@ -253,6 +260,8 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 		
 		timer.start(3, "Duelsin alkuun");
+		
+		FileHandler.increaseKitPlayedCount(kit.getName());
 	}
 	
 	private void setKitItems(Player p, List<ItemStack> items) {

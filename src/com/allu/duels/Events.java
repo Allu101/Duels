@@ -1,6 +1,8 @@
 package com.allu.duels;
 
 
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -55,7 +57,7 @@ public class Events implements Listener, CommandExecutor {
 		if(cmd.getName().equalsIgnoreCase("duel")) {
 			
 			if (dp.getGameWhereJoined() != null) {
-				p.sendMessage("&cEt voi tehdä tätä, kun olet pelissä!");
+				p.sendMessage("§cEt voi tehdä tätä, kun olet pelissä!");
 				return true;
 			}
 			
@@ -109,14 +111,12 @@ public class Events implements Listener, CommandExecutor {
 						return true;
 					}
 					
-					DuelsGame game = lobby.getFreeGame(Gamemode.DUELS_1V1);
+					lobby.startNewDuelsMatch(
+							challenge.getDuelsPlayers(),
+							challenge.getKit(),
+							DuelsGame.GameType.FRIEND_CHALLENGE,
+							p);
 					
-					if(game == null) {
-						p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
-					} else {
-						game.startGame(challenge.getDuelsPlayers(), challenge.getKit(), DuelsGame.GameType.FRIEND_CHALLENGE);
-						lobby.removeChallengesWithPlayers(challenge.getDuelsPlayers().toArray(new DuelsPlayer[2]));
-					}
 					return true;
 				}
 			}

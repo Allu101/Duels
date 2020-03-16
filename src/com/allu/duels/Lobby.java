@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffect;
 
+import com.allu.duels.DuelsGame.GameType;
 import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 
@@ -51,8 +52,6 @@ public class Lobby {
 			}
 		}
 		
-		System.out.println("gameCount: " + games.size());
-		
 		return null;
 	}
 	
@@ -76,6 +75,8 @@ public class Lobby {
 	}
 	
 	public void onPlayerLeave(DuelsPlayer dp) {
+		this.removePlayerFromRankedQueue(dp.getPlayer());
+		this.removeChallengesWithPlayers(dp);
 		players.remove(dp);
 	}
 	
@@ -83,6 +84,13 @@ public class Lobby {
 		
 		Player challengerPlayer = challenger.getPlayer();
 		Player challengedPlayer = challenged.getPlayer();
+		
+		if (challenger.getGameWhereJoined() != null) {
+			challengerPlayer.sendMessage(ChatColor.RED + "Et voi luoda haastetta, sillä olet itse pelissä!");
+		}
+		if (challenged.getGameWhereJoined() != null) {
+			challengerPlayer.sendMessage(ChatColor.RED + "Et voi luoda haastetta, sillä haastamasi pelaaja on jo pelissä!");
+		}
 		
 		Challenge existingChallenge = this.getChallenge(challengerPlayer, challengedPlayer);
 		
@@ -168,6 +176,41 @@ public class Lobby {
 	}
 	
 	/**
+	 * 
+	 * @param duelsPlayers
+	 * @param game
+	 * @param kit
+	 * @param gameType
+	 */
+	public void startNewDuelsMatch(List<DuelsPlayer> duelsPlayers, Kit kit, GameType gameType, Player activator) {
+		
+		DuelsGame game = getFreeGame(Gamemode.DUELS_1V1);
+		
+		if(game == null) {
+			activator.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
+			return;
+		}
+		
+		boolean alreadyInGame = false;
+		for (DuelsPlayer dpp : duelsPlayers) {
+			removePlayerFromRankedQueue(dpp.getPlayer());
+			if (dpp.getGameWhereJoined() != null) {
+				alreadyInGame = true;
+			}
+		}
+		
+		if (alreadyInGame) {
+			activator.sendMessage(ChatColor.RED + "Tapahtui virhe, peliä ei voida aloittaa!");
+			return;
+		}
+		
+		game.startGame(duelsPlayers, kit, gameType);
+		removeChallengesWithPlayers(duelsPlayers.toArray(new DuelsPlayer[2]));
+		
+		printQueueToConsole();
+	}
+	
+	/**
 	 * This method should be used for returning players back to lobby!
 	 * @param dp
 	 */
@@ -227,6 +270,10 @@ public class Lobby {
 		
 		DuelsPlayer dpp = getDuelsPlayer(p);
 		
+		if (dpp.getGameWhereJoined() != null) {
+			p.sendMessage(ChatColor.RED + "Et voi liittyä jonoon, sillä olet pelissä!");
+		}
+		
 		if (this.rankedQueue.size() > 0) {
 			
 			if (this.rankedQueue.contains(p)) {
@@ -235,24 +282,29 @@ public class Lobby {
 			} else {
 				Player opponent = rankedQueue.get(0);
 				
-				if (opponent.isOnline()) {
+				if (!opponent.isOnline()) {
+					
+					this.rankedQueue.remove(opponent);
+					
+				} else {
+					
 					DuelsPlayer dpOpponent = getDuelsPlayer(opponent);
 					
-					DuelsGame game = getFreeGame(Gamemode.DUELS_1V1);
-					if(game != null) {
+					if (dpOpponent.getGameWhereJoined() == null) {
+					
+						p.sendMessage("Vastustaja löytyi: " + opponent.getDisplayName());
+						
 						List<DuelsPlayer> duelsPlayers = new ArrayList<DuelsPlayer>();
 						duelsPlayers.add(dpp);
 						duelsPlayers.add(dpOpponent);
-						game.startGame(duelsPlayers, Duels.plugin.getKitByName("op duel"), DuelsGame.GameType.RANKED);
-						this.rankedQueue.remove(opponent);
-						return;
-					} else {
-						p.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
+						
+						this.startNewDuelsMatch(
+								duelsPlayers,
+								Duels.plugin.getKitByName("op duel"),
+								DuelsGame.GameType.RANKED,
+								p);
 						return;
 					}
-					
-				} else {
-					this.rankedQueue.remove(opponent);
 				}
 			}
 		}
@@ -261,10 +313,25 @@ public class Lobby {
 		p.sendMessage("§aOdotat nyt vastustajaa peliin!");
 		menuHandler.addExitQueueItemToPlayer(p);
 		dpp.setChallengedPlayer(null);
+		
+		printQueueToConsole();
 	}
 	
+	private void printQueueToConsole() {
+		String consoleMsg = "Jonossa ovat nyt: ";
+		for (Player player : this.rankedQueue) {
+			consoleMsg += player.getDisplayName() + ", ";
+		}
+		System.out.println(consoleMsg);
+	}
+	
+	/**
+	 * Removes the player from ranked queue if they are in one.
+	 * Also removes the exit queue item from the players inventory.
+	 * @param p
+	 */
 	public void removePlayerFromRankedQueue(Player p) {
-		this.rankedQueue.remove(p);
+		rankedQueue.removeIf(player -> player.getUniqueId().equals(p.getUniqueId()));
 		menuHandler.removeExitQueueItemFromPlayer(p);
 	}
 }

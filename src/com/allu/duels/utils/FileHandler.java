@@ -20,7 +20,7 @@ public class FileHandler {
 		}
 	}
 	
-	public static void increaceKitPlayedCount(String kitName) {
+	public static void increaseKitPlayedCount(String kitName) {
 		YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 		int playedCount;
 		if(cfg.contains(kitName)) {
