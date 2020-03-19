@@ -239,6 +239,11 @@ public class Events implements Listener, CommandExecutor {
 		if(e.getClick().isKeyboardClick() && !p.getWorld().getName().equals(Duels.getLobbyWorldName())) {
 			return;
 		}
+		
+		DuelsPlayer dp = lobby.getDuelsPlayer(p);
+		if (dp != null && dp.getGameWhereJoined() != null)
+			return;
+		
 		e.setCancelled(true);
 		menuHandler.inventoryClickHandler(lobby.getDuelsPlayer(p), e.getCurrentItem());
 	}
