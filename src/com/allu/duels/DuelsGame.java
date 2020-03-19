@@ -148,26 +148,29 @@ public class DuelsGame implements CountDownTimerListener {
 			else {
 				
 				DuelsPlayer opponent = getOtherPlayer(dp);
+				
+				if (dp != null && opponent != null) {
 					
-				double result = 0;
-				if (dp.equals(winner))
-					result = 1;
-				
-				double expectedScore = getExpectedScore(dp.getEloScore(), opponent.getEloScore());
-				double eloChange = (result - expectedScore) * 32 + 0.2; // + 0.2 for little total score increase over time.
-				int finalEloChange = (int)Math.round(eloChange);
-				
-				dp.setEloScore(dp.getEloScore() + finalEloChange);
-				
-				if (finalEloChange == 0) {
-					p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivät muuttuneet pelin tuloksena.");
-				}
-				else if (finalEloChange < 0) {
-					p.sendMessage(ChatColor.RED + "Menetit " + (-finalEloChange) + " ranking-pistettä");
-				}
-				else if (finalEloChange > 0) {
-					p.sendMessage(ChatColor.GREEN + "Sait " + finalEloChange + " ranking-pistettä!");
-					p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0f);
+					double result = 0;
+					if (dp.equals(winner))
+						result = 1;
+					
+					double expectedScore = getExpectedScore(dp.getEloScore(), opponent.getEloScore());
+					double eloChange = (result - expectedScore) * 32 + 0.2; // + 0.2 for little total score increase over time.
+					int finalEloChange = (int)Math.round(eloChange);
+					
+					dp.setEloScore(dp.getEloScore() + finalEloChange);
+					
+					if (finalEloChange == 0) {
+						p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivät muuttuneet pelin tuloksena.");
+					}
+					else if (finalEloChange < 0) {
+						p.sendMessage(ChatColor.RED + "Menetit " + (-finalEloChange) + " ranking-pistettä");
+					}
+					else if (finalEloChange > 0) {
+						p.sendMessage(ChatColor.GREEN + "Sait " + finalEloChange + " ranking-pistettä!");
+						p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0f);
+					}
 				}
 			}
 

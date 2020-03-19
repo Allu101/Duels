@@ -181,9 +181,10 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 				kitItems.add(is);
 			}
 			
-			String kitName = "§9" + config.getString(kitPath + ".name") + " Duel";
-			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")), kitName
-					, getKitMenuItemBodyText(kitItems));
+			String kitName = config.getString(kitPath + ".name") + " Duel";
+			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")),
+					"§9" + kitName,
+					getKitMenuItemBodyText(kitItems));
 			Kit kit = new Kit(kitMenuItem, kitItems, kitName);
 			kits.add(kit);
 		}

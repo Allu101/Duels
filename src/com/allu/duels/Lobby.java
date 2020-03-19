@@ -34,11 +34,19 @@ public class Lobby {
 	
 	private ArrayList<Player> rankedQueue = new ArrayList<>();
 	
+	private ArrayList<String> rankedKitNames;
+	
 
 	public Lobby(FileConfiguration config, MenuHandler menuHandler) {
+		
 		spawnLocation = new Location(Bukkit.getWorld(config.getString("lobbyworldname")), config.getDouble("spawnloc.x"), config.getDouble("spawnloc.y"), config.getDouble("spawnloc.z"), 
 				config.getInt("spawnloc.yaw"), config.getInt("spawnloc.pitch"));
 		this.menuHandler = menuHandler;
+		
+		rankedKitNames = new ArrayList<String>();
+		rankedKitNames.add("classic duel");
+		rankedKitNames.add("op duel");
+		rankedKitNames.add("jousi duel");
 	}
 	
 	public void addGame(DuelsGame game) {
@@ -297,10 +305,11 @@ public class Lobby {
 						List<DuelsPlayer> duelsPlayers = new ArrayList<DuelsPlayer>();
 						duelsPlayers.add(dpp);
 						duelsPlayers.add(dpOpponent);
+
 						
 						this.startNewDuelsMatch(
 								duelsPlayers,
-								Duels.plugin.getKitByName("op duel"),
+								Duels.plugin.getKitByName(this.rankedKitNames.get((int)(Math.random() * this.rankedKitNames.size()))),
 								DuelsGame.GameType.RANKED,
 								p);
 						return;
