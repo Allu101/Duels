@@ -79,6 +79,7 @@ public class Events implements Listener, CommandExecutor {
 				String opponentName = opponent.getName();
 				if(opponentDp.getGameWhereJoined() != null) {
 					p.sendMessage(ChatColor.RED + "Et voi haastaa pelaajaa " + opponentName + ", koska hänellä on peli menossa.");
+					return true;
 				}
 				if(args[0].equalsIgnoreCase(opponentName)) {
 					if(p.getName().equals(opponentName)) {
