@@ -2,6 +2,7 @@ name: Duels
 main: com.allu.duels.Duels
 api-version: 1.14
 version: 0.7
+softdepend: [MinigameAPI]
 commands:
     duel:
       description: main command
