@@ -1,8 +1,6 @@
 package com.allu.duels;
 
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -25,13 +23,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import com.allu.duels.utils.Gamemode;
 
 
 public class Events implements Listener, CommandExecutor {
@@ -211,25 +209,6 @@ public class Events implements Listener, CommandExecutor {
 	
 	
 	@EventHandler
-	public void creatureSpawn(CreatureSpawnEvent e) {
-		if(!e.getEntityType().equals(EntityType.ARMOR_STAND)) {
-			e.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	public void onFoodLevelChange(FoodLevelChangeEvent e) {
-		e.setCancelled(true);
-	}
-	
-	
-	@EventHandler
-	public void onArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
-		if (!e.getPlayer().isOp())
-			e.setCancelled(true);
-	}
-	
-	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		ItemStack is = e.getCurrentItem();
 		if(is == null || is.getType().equals(Material.AIR)) {
@@ -308,12 +287,6 @@ public class Events implements Listener, CommandExecutor {
 		}
 	}
 	
-	@EventHandler
-	public void onPlayerDrop(PlayerDropItemEvent e) {
-		if(e.getPlayer() != null) {
-			e.setCancelled(true);
-		}
-	}
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
@@ -338,6 +311,19 @@ public class Events implements Listener, CommandExecutor {
 				lobby.removePlayerFromRankedQueue(e.getPlayer());
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+		final Player player = event.getPlayer();
+		 
+        if (event.getItem().getType().equals(Material.POTION)) {
+            Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(Duels.plugin, new Runnable() {
+                public void run() {
+                    player.setItemInHand(new ItemStack(Material.AIR));
+                }
+            }, 1L);
+        }
 	}
 	
 	@EventHandler
@@ -399,8 +385,33 @@ public class Events implements Listener, CommandExecutor {
 	}
 	
 	@EventHandler
+	public void onPlayerDropItem(PlayerDropItemEvent e) {
+		if(e.getPlayer() != null) {
+			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onArmorStandManipulate(PlayerArmorStandManipulateEvent e) {
+		if (!e.getPlayer().isOp())
+			e.setCancelled(true);
+	}
+	
+	@EventHandler
 	public void onPlayerItemDamage(PlayerItemDamageEvent e) {
 		e.getItem().setDurability((short)0);
+		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void creatureSpawn(CreatureSpawnEvent e) {
+		if(!e.getEntityType().equals(EntityType.ARMOR_STAND)) {
+			e.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	public void onFoodLevelChange(FoodLevelChangeEvent e) {
 		e.setCancelled(true);
 	}
 }
