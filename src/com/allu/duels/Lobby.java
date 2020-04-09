@@ -57,9 +57,9 @@ public class Lobby {
 		games.add(game);
 	}
 	
-	public DuelsGame getFreeGame(Gamemode gamemode) {
+	public DuelsGame getFreeGame(String arenaType) {
 		for(DuelsGame game : games) {
-			if(game.getGamemode().equals(gamemode) && game.isFree()) {
+			if(game.getArenaType().equals(arenaType) && game.isFree()) {
 				return game;
 			}
 		}
@@ -196,7 +196,7 @@ public class Lobby {
 	 */
 	public void startNewDuelsMatch(List<DuelsPlayer> duelsPlayers, Kit kit, GameType gameType, Player activator) {
 		
-		DuelsGame game = getFreeGame(Gamemode.DUELS_1V1);
+		DuelsGame game = getFreeGame(kit.getArenaType());
 		
 		if(game == null) {
 			activator.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");

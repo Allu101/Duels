@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -205,6 +206,31 @@ public class Events implements Listener, CommandExecutor {
 			return;
 		}
 		e.setCancelled(true);
+	}
+	
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent e) {
+		
+		if (!e.getPlayer().getGameMode().equals(GameMode.ADVENTURE)) {
+			return;
+		}
+		
+		DuelsPlayer dp = lobby.getDuelsPlayer(e.getPlayer());
+		if (dp == null) return;
+		
+		DuelsGame game = dp.getGameWhereJoined();
+		if (game == null)
+			return;
+		
+	    Material m = e.getPlayer().getLocation().getBlock().getType();
+	    if (game.isGameOn() && m == Material.STATIONARY_WATER || m == Material.WATER) {
+	        game.onPlayerDie(e.getPlayer());
+	    }
+	    
+	    if (game.isGameStarting() && ((e.getTo().getX() != e.getFrom().getX()) || (e.getTo().getZ() != e.getFrom().getZ()))) {
+            e.setTo(e.getFrom());
+            return;
+        }
 	}
 	
 	

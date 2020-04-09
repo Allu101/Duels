@@ -13,6 +13,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.allu.duels.utils.FileHandler;
 import com.allu.duels.utils.Gamemode;
@@ -35,7 +37,7 @@ public class DuelsGame implements CountDownTimerListener {
 	
 
 	private GameState currentGameState = GameState.FREE;
-	private Gamemode gameMode;
+	private String arenaType;
 	private GameType gameType;
 
 	private List<Location> buildedBlocks = new ArrayList<Location>();
@@ -52,13 +54,21 @@ public class DuelsGame implements CountDownTimerListener {
 	private SimpleRanking winsRanking;
 	private SimpleRanking eloRanking;
 
-	public DuelsGame(Lobby lobby, Location arenaCenterLoc, Gamemode gameMode, MessageHandler messages, SimpleRanking winsRanking, SimpleRanking eloRanking) {
+	public DuelsGame(Lobby lobby, Location arenaCenterLoc, String arenaType, MessageHandler messages, SimpleRanking winsRanking, SimpleRanking eloRanking) {
 		this.lobby = lobby;
 		this.arenaCenterLoc = arenaCenterLoc;
-		this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
-		this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
+		
+		if (arenaType.equals("sumo")) {
+			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -3);
+			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 3);
+		}
+		else {
+			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
+			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
+		}
+
 		spawn2.setYaw(-180);
-		this.gameMode = gameMode;
+		this.arenaType = arenaType;
 		this.timer = new CountDownTimer(this);
 		this.messages = messages;
 		this.winsRanking = winsRanking;
@@ -81,6 +91,7 @@ public class DuelsGame implements CountDownTimerListener {
 					for (DuelsPlayer dp : players) {
 						Player p = dp.getPlayer();
 						p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
+						p.setHealth(p.getMaxHealth());
 						p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
 						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 								"title " + p.getName() + " times 0 20 10");
@@ -188,8 +199,8 @@ public class DuelsGame implements CountDownTimerListener {
 		return 1.0 / (1.0 + Math.pow(10, (eloOther - eloOwn) / 400.0));
 	}
 	
-	public Gamemode getGamemode() {
-		return gameMode;
+	public String getArenaType() {
+		return this.arenaType;
 	}
 
 	public List<Location> getPlacedBlocks() {
@@ -202,6 +213,10 @@ public class DuelsGame implements CountDownTimerListener {
 
 	public boolean isGameOn() {
 		return currentGameState == GameState.PLAYING;
+	}
+	
+	public boolean isGameStarting() {
+		return currentGameState == GameState.STARTING;
 	}
 
 	public void leaveGame(DuelsPlayer dp) {

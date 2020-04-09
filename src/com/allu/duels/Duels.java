@@ -69,9 +69,9 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		this.getCommand("kits").setExecutor(this);
 		
 	    loadKitsFromConfig();
-		createGames(Gamemode.DUELS_1V1);
-//		createGames(Gamemode.DUELS_2V2);
-//		createGames(Gamemode.DUELS_4V4);
+		createGames("default");
+		createGames("sumo");
+		
 		
 		World world = Bukkit.getWorld(LOBBY_WORLD);
 		winsRanking.addFloatingRankingList(new Location(world, 5.5, 11, -37.5),
@@ -93,14 +93,14 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		return LOBBY_WORLD;
 	}
 	
-	private void createGames(Gamemode gameMode) {
-		String path = "duels" + gameMode.getString();
+	private void createGames(String arenaType) {
+		String path = "duels" + arenaType;
 		int available_games = config.getInt(path + ".gamesavailable");
-		System.out.println(gameMode.toString() + " games available: " + available_games);
+		System.out.println(arenaType + " games available: " + available_games);
 		for (int i = 0; i < available_games; i++) {
-			String gameWorld = "gameworld_" + gameMode.getString();
+			String gameWorld = "gameworld_" + arenaType;
 		    createWorldIfDoesntExist(gameWorld);
-			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, gameWorld), gameMode, new MessageHandler(), this.winsRanking, this.eloRanking));
+			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, arenaType, gameWorld), arenaType, new MessageHandler(), this.winsRanking, this.eloRanking));
 		}
 	}
 	
@@ -115,8 +115,8 @@ public class Duels extends JavaPlugin implements CommandExecutor {
     	Bukkit.createWorld(wc);
     }
 	
-	private Location getArenaCenterLoc(int orderNumber, String world) {
-		String path = "firstarenacenter.";
+	private Location getArenaCenterLoc(int orderNumber, String arenaType, String world) {
+		String path = "duels" + arenaType + ".firstarenacenter.";
 		double x = config.getDouble(path + "x") * orderNumber;
 		double y = config.getDouble(path + "y");
 		double z = config.getDouble(path + "z");
@@ -190,7 +190,10 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")),
 					"§9" + kitName,
 					getKitMenuItemBodyText(kitItems));
-			Kit kit = new Kit(kitMenuItem, kitItems, kitName);
+			
+			String arenaType = config.getString(kitPath + ".arena", "default");
+			
+			Kit kit = new Kit(kitMenuItem, kitItems, kitName, arenaType);
 			kits.add(kit);
 		}
 	}

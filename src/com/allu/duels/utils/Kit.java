@@ -10,11 +10,14 @@ public class Kit {
 	private ItemStack menuItem;
 	private List<ItemStack> items = new ArrayList<ItemStack>();
 	private String name;
+	private String arenaType;
 	
-	public Kit(ItemStack menuItem, List<ItemStack> kitItems, String name) {
+
+	public Kit(ItemStack menuItem, List<ItemStack> kitItems, String name, String arenaType) {
 		this.menuItem = menuItem;
 		this.items = kitItems;
 		this.name = name;
+		this.arenaType = arenaType;
 	}
 	
 	public ItemStack getMenuItem() {
@@ -27,5 +30,9 @@ public class Kit {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getArenaType() {
+		return arenaType;
 	}
 }
