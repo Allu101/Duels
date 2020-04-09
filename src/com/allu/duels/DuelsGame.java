@@ -284,7 +284,17 @@ public class DuelsGame implements CountDownTimerListener {
 				p.getInventory().setBoots(new ItemStack(is));
 			}
 			else {
-				p.getInventory().addItem(new ItemStack(is));
+				if (is.getMaxStackSize() == 1) {
+					int count = is.getAmount();
+					ItemStack oneItemIS = new ItemStack(is);
+					oneItemIS.setAmount(1);
+					for (int i = 0; i < count; i++) {
+						p.getInventory().addItem(new ItemStack(oneItemIS));
+					}
+				}
+				else {
+					p.getInventory().addItem(new ItemStack(is));
+				}
 			}
 		}
 		

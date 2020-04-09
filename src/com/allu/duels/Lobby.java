@@ -32,9 +32,9 @@ public class Lobby {
 	
 	private MenuHandler menuHandler;
 	
-	private ArrayList<Player> rankedQueue = new ArrayList<>();
+	private List<Player> rankedQueue = new ArrayList<>();
 	
-	private ArrayList<String> rankedKitNames;
+	private List<String> rankedKitNames;
 	
 
 	public Lobby(FileConfiguration config, MenuHandler menuHandler) {
@@ -43,10 +43,14 @@ public class Lobby {
 				config.getInt("spawnloc.yaw"), config.getInt("spawnloc.pitch"));
 		this.menuHandler = menuHandler;
 		
-		rankedKitNames = new ArrayList<String>();
-		rankedKitNames.add("classic duel");
-		rankedKitNames.add("op duel");
-		rankedKitNames.add("jousi duel");
+		rankedKitNames = config.getStringList("ranked-duels");
+		
+		if (rankedKitNames == null) {
+			rankedKitNames = new ArrayList<>();
+			rankedKitNames.add("classic duel");
+			rankedKitNames.add("op duel");
+			rankedKitNames.add("jousi duel");
+		}
 	}
 	
 	public void addGame(DuelsGame game) {

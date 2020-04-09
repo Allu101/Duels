@@ -170,9 +170,14 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 					if (config.isSet(potionTypePath)) {
 						
 						Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
+						
 						if (config.getBoolean(itemPath + ".splash", false)) {
 							potion.setSplash(true);
 						}
+						potion.setLevel(config.getInt(itemPath + ".level", 1));
+						
+						// This line causes error: "Instant potions cannot be extended"
+						//potion.setHasExtendedDuration(config.getBoolean(itemPath + ".extended", false));
 						
 						potion.apply(is);
 					}
