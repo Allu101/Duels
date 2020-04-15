@@ -11,6 +11,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -69,8 +70,12 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		this.getCommand("kits").setExecutor(this);
 		
 	    loadKitsFromConfig();
-		createGames("default");
-		createGames("sumo");
+	    
+	    ConfigurationSection arenaSection = config.getConfigurationSection("arenas");
+	    for (String key : arenaSection.getKeys(false)) {
+	    	createGames(key);
+	    	System.out.println("Created gameworld for " + key);
+	    }
 		
 		
 		World world = Bukkit.getWorld(LOBBY_WORLD);
@@ -94,7 +99,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	}
 	
 	private void createGames(String arenaType) {
-		String path = "duels" + arenaType;
+		String path = "arenas." + arenaType;
 		int available_games = config.getInt(path + ".gamesavailable");
 		System.out.println(arenaType + " games available: " + available_games);
 		for (int i = 0; i < available_games; i++) {
@@ -116,7 +121,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
     }
 	
 	private Location getArenaCenterLoc(int orderNumber, String arenaType, String world) {
-		String path = "duels" + arenaType + ".firstarenacenter.";
+		String path = "arenas." + arenaType + ".firstarenacenter.";
 		double x = config.getDouble(path + "x") * orderNumber;
 		double y = config.getDouble(path + "y");
 		double z = config.getDouble(path + "z");

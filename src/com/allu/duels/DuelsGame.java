@@ -62,6 +62,10 @@ public class DuelsGame implements CountDownTimerListener {
 			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -3);
 			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 3);
 		}
+		else if (arenaType.equals("gridpvp")) {
+			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -8);
+			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 8);
+		}
 		else {
 			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
 			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
