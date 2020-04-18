@@ -328,6 +328,8 @@ public class DuelsGame implements CountDownTimerListener {
 			} else {
 				players.get(i).getPlayer().teleport(spawn2, TeleportCause.PLUGIN);
 			}
+			
+			players.get(i).getPlayer().setFlying(false);
 		}
 	}
 	
