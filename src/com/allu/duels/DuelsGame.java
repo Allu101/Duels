@@ -8,16 +8,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import com.allu.duels.utils.FileHandler;
-import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
 import com.allu.minigameapi.CountDownTimerListener;
@@ -30,56 +24,36 @@ public class DuelsGame implements CountDownTimerListener {
 		RANKED, FRIEND_CHALLENGE
 	}
 	
-	
 	private enum GameState {
 		FREE, STARTING, PLAYING, GAME_FINISH
 	}
 	
-
 	private GameState currentGameState = GameState.FREE;
-	private String arenaType;
+
 	private GameType gameType;
 
-	private List<Location> buildedBlocks = new ArrayList<Location>();
 	private List<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
-	private Location arenaCenterLoc, spawn1, spawn2;
 
 	private Lobby lobby;
 	private MessageHandler messages;
 	private CountDownTimer timer;
 	
-	private int arenaXWidth = 50;
-	private int arenaZWidth = 80;
-	
 	private SimpleRanking winsRanking;
 	private SimpleRanking eloRanking;
 	
 	private Kit kit;
+	
+	private Arena arena;
 
 	
-	public DuelsGame(Lobby lobby, Location arenaCenterLoc, String arenaType, MessageHandler messages, SimpleRanking winsRanking, SimpleRanking eloRanking) {
+	public DuelsGame(Lobby lobby, Arena arena, SimpleRanking winsRanking, SimpleRanking eloRanking) {
 		this.lobby = lobby;
-		this.arenaCenterLoc = arenaCenterLoc;
-		
-		if (arenaType.equals("sumo")) {
-			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -3);
-			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 3);
-		}
-		else if (arenaType.equals("gridpvp")) {
-			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -8);
-			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 8);
-		}
-		else {
-			this.spawn1 = arenaCenterLoc.clone().add(0, 0, -26);
-			this.spawn2 = arenaCenterLoc.clone().add(0, 0, 26);
-		}
-
-		spawn2.setYaw(-180);
-		this.arenaType = arenaType;
-		this.timer = new CountDownTimer(this);
-		this.messages = messages;
+		this.arena = arena;
 		this.winsRanking = winsRanking;
 		this.eloRanking = eloRanking;
+		
+		this.messages = new MessageHandler();
+		this.timer = new CountDownTimer(this);
 	}
 
 	@Override
@@ -207,11 +181,11 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	public String getArenaType() {
-		return this.arenaType;
+		return this.arena.getArenaName();
 	}
 
 	public List<Location> getPlacedBlocks() {
-		return buildedBlocks;
+		return this.arena.getPlacedBlocks();
 	}
 
 	public boolean isFree() {
@@ -242,19 +216,7 @@ public class DuelsGame implements CountDownTimerListener {
 		this.players = dplayers;
 		this.gameType = gameType;
 		
-		// Remove all the arrows from the arena.
-		Bukkit.getScheduler().runTaskLater(Duels.plugin, new Runnable() {
-			@Override
-			public void run() {
-				List<Entity> entities = arenaCenterLoc.getWorld().getEntities();
-				for (Entity entity : entities) {
-					EntityType eType = entity.getType();
-					if(eType.equals(EntityType.ARROW) && isWithinArena(entity.getLocation())) {
-						entity.remove();
-					}
-				}
-			}
-		}, 10);
+		this.arena.clearArrows();
 		
 		teleportPlayersToSpawnPoints();
 		
@@ -329,11 +291,7 @@ public class DuelsGame implements CountDownTimerListener {
 
 	private void teleportPlayersToSpawnPoints() {
 		for (int i = 0; i < players.size(); i++) {
-			if (i % 2 == 0) {
-				players.get(i).getPlayer().teleport(spawn1, TeleportCause.PLUGIN);
-			} else {
-				players.get(i).getPlayer().teleport(spawn2, TeleportCause.PLUGIN);
-			}
+			players.get(i).getPlayer().teleport(this.arena.getSpawn(i), TeleportCause.PLUGIN);
 		}
 	}
 	
@@ -346,30 +304,11 @@ public class DuelsGame implements CountDownTimerListener {
 		return null;
 	}
 	
-	public boolean isWithinArena(Location loc) {
-		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld())) {
-			return false;
-		}
-		long halfArenaXWidht = this.arenaXWidth / 2;
-		long halfArenaZWidht = this.arenaZWidth / 2;
-		if (loc.getBlockX() < this.arenaCenterLoc.getBlockX() - halfArenaXWidht
-				|| loc.getBlockX() > this.arenaCenterLoc.getBlockX() + halfArenaXWidht
-				|| loc.getBlockZ() < this.arenaCenterLoc.getBlockZ() - halfArenaZWidht
-				|| loc.getBlockZ() > this.arenaCenterLoc.getBlockZ() + halfArenaZWidht) {
-			return false;
-		}
-		return true;
-	}
 	
-	public boolean isNearArenaFloorLevel(double y) {
-		return Math.abs(y - this.arenaCenterLoc.getY()) < 2.5;
-	}
-	
-	public boolean isUnderArena(Location loc) {
-		if (!loc.getWorld().equals(this.arenaCenterLoc.getWorld())) {
-			return false;
-		}
-		return loc.getBlockY() < this.arenaCenterLoc.getBlockY() - 4;
+	private String getGameTypeString(GameType gameType) {
+		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "Kaverihaaste";
+		if (gameType.equals(GameType.RANKED)) return "Kilpailullinen";
+		return "???";
 	}
 	
 	public boolean isDamageDisabled() {
@@ -377,9 +316,15 @@ public class DuelsGame implements CountDownTimerListener {
 		return this.kit.isInvulnerable();
 	}
 	
-	private String getGameTypeString(GameType gameType) {
-		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "Kaverihaaste";
-		if (gameType.equals(GameType.RANKED)) return "Kilpailullinen";
-		return "???";
+	public boolean isWithinArena(Location loc) {
+		return this.arena.isWithinArena(loc);
+	}
+	
+	public boolean isNearArenaFloorLevel(double y) {
+		return this.arena.isNearArenaFloorLevel(y);
+	}
+	
+	public boolean isUnderArena(Location loc) {
+		return this.arena.isUnderArena(loc);
 	}
 }

@@ -16,17 +16,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-
 import com.allu.duels.utils.DatabaseHandler;
-import com.allu.duels.utils.Gamemode;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.ItemHelpper;
-import com.allu.minigameapi.MessageHandler;
 import com.allu.minigameapi.ranking.SimpleRanking;
 
 public class Duels extends JavaPlugin implements CommandExecutor {
@@ -98,14 +94,17 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		return LOBBY_WORLD;
 	}
 	
-	private void createGames(String arenaType) {
-		String path = "arenas." + arenaType;
+	private void createGames(String arenaName) {
+		String path = "arenas." + arenaName;
 		int available_games = config.getInt(path + ".gamesavailable");
-		System.out.println(arenaType + " games available: " + available_games);
+		System.out.println(arenaName + " games available: " + available_games);
+		
+		String gameWorld = "gameworld_" + arenaName;
+	    createWorldIfDoesntExist(gameWorld);
+	    
 		for (int i = 0; i < available_games; i++) {
-			String gameWorld = "gameworld_" + arenaType;
-		    createWorldIfDoesntExist(gameWorld);
-			lobby.addGame(new DuelsGame(lobby, getArenaCenterLoc(i+1, arenaType, gameWorld), arenaType, new MessageHandler(), this.winsRanking, this.eloRanking));
+			Arena arena = new Arena(arenaName, getArenaCenterLoc(i+1, arenaName, gameWorld), config.getInt(path + ".spawn-distance", 1));
+			lobby.addGame(new DuelsGame(lobby, arena, this.winsRanking, this.eloRanking));
 		}
 	}
 	
