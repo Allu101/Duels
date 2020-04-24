@@ -1,5 +1,6 @@
 package com.allu.duels;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -13,6 +14,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,10 +31,12 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	public static Duels plugin;
 	
+    public FileConfiguration config;
+    private File cFile;
+    
 	public DatabaseHandler dbHandler = new DatabaseHandler(this);
 	
 	private static String LOBBY_WORLD;
-	private FileConfiguration config = this.getConfig();
 	private ArrayList<Kit> kits = new ArrayList<>();
 	
 	private Events events;
@@ -45,8 +49,13 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	@Override
     public void onEnable() {
+		
 		plugin = this;
-		this.saveDefaultConfig();
+		
+        config = getConfig();
+        config.options().copyDefaults(true);
+        saveConfig();
+        cFile = new File(getDataFolder(), "config.yml");
 	    
 	    winsRanking = new SimpleRanking(dbHandler.loadTop10PlayersToWinsScoreboard());
 	    eloRanking = new SimpleRanking(dbHandler.loadTop10PlayersToEloScoreScoreboard());
@@ -242,7 +251,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {	
 		if(cmd.getName().equalsIgnoreCase("duelsreload")) {
-			this.reloadConfig();
+			config = YamlConfiguration.loadConfiguration(cFile);
 			this.kits.clear();
 			this.loadKitsFromConfig();
 			sender.sendMessage("§aKits have been reloaded!");
