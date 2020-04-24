@@ -270,7 +270,7 @@ public class Events implements Listener, CommandExecutor {
 			return;
 		}
 		
-		if(!gameWhereJoined.isGameOn()) {
+		if(!gameWhereJoined.isGameOn() || gameWhereJoined.isDamageDisabled()) {
 			e.setCancelled(true);
 			return;
 		}

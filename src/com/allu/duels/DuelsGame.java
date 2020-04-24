@@ -53,7 +53,10 @@ public class DuelsGame implements CountDownTimerListener {
 	
 	private SimpleRanking winsRanking;
 	private SimpleRanking eloRanking;
+	
+	private Kit kit;
 
+	
 	public DuelsGame(Lobby lobby, Location arenaCenterLoc, String arenaType, MessageHandler messages, SimpleRanking winsRanking, SimpleRanking eloRanking) {
 		this.lobby = lobby;
 		this.arenaCenterLoc = arenaCenterLoc;
@@ -232,6 +235,8 @@ public class DuelsGame implements CountDownTimerListener {
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit, GameType gameType) {
 		
+		this.kit = kit;
+		
 		currentGameState = GameState.STARTING;
 		
 		this.players = dplayers;
@@ -270,15 +275,14 @@ public class DuelsGame implements CountDownTimerListener {
 			}
 			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(this.gameType), kit.getName(), opponentString);
 			
-			p.getInventory().clear();
-			p.updateInventory();
-			
 			Bukkit.getScheduler().runTaskLater(Duels.plugin, new Runnable() {
 				@Override
 				public void run() {
 					setKitItems(p, kit.getItems());
+					p.getPlayer().setFlying(false);
+					p.getPlayer().setAllowFlight(false);
 				}
-			}, 10);
+			}, 5);
 		}
 		
 		timer.start(3, "Duelsin alkuun");
@@ -287,6 +291,8 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	private void setKitItems(Player p, List<ItemStack> items) {
+		
+		p.getInventory().clear();
 		
 		for (ItemStack is : items) {
 			String itemTypeString = is.getType().toString();
@@ -328,8 +334,6 @@ public class DuelsGame implements CountDownTimerListener {
 			} else {
 				players.get(i).getPlayer().teleport(spawn2, TeleportCause.PLUGIN);
 			}
-			
-			players.get(i).getPlayer().setFlying(false);
 		}
 	}
 	
@@ -366,6 +370,11 @@ public class DuelsGame implements CountDownTimerListener {
 			return false;
 		}
 		return loc.getBlockY() < this.arenaCenterLoc.getBlockY() - 4;
+	}
+	
+	public boolean isDamageDisabled() {
+		if (this.kit == null) return false;
+		return this.kit.isInvulnerable();
 	}
 	
 	private String getGameTypeString(GameType gameType) {

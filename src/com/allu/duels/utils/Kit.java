@@ -11,13 +11,17 @@ public class Kit {
 	private List<ItemStack> items = new ArrayList<ItemStack>();
 	private String name;
 	private String arenaType;
+	private boolean invulnerable;
 	
-
 	public Kit(ItemStack menuItem, List<ItemStack> kitItems, String name, String arenaType) {
+		this(menuItem, kitItems, name, arenaType, false);
+	}
+	public Kit(ItemStack menuItem, List<ItemStack> kitItems, String name, String arenaType, boolean invulnerable) {
 		this.menuItem = menuItem;
 		this.items = kitItems;
 		this.name = name;
 		this.arenaType = arenaType;
+		this.invulnerable = invulnerable;
 	}
 	
 	public ItemStack getMenuItem() {
@@ -34,5 +38,9 @@ public class Kit {
 	
 	public String getArenaType() {
 		return arenaType;
+	}
+	
+	public boolean isInvulnerable() {
+		return invulnerable;
 	}
 }

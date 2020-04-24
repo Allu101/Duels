@@ -197,8 +197,9 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 					getKitMenuItemBodyText(kitItems));
 			
 			String arenaType = config.getString(kitPath + ".arena", "default");
+			Boolean invulnerable = config.getBoolean(kitPath + ".invulnerable", false);
 			
-			Kit kit = new Kit(kitMenuItem, kitItems, kitName, arenaType);
+			Kit kit = new Kit(kitMenuItem, kitItems, kitName, arenaType, invulnerable);
 			kits.add(kit);
 		}
 	}
