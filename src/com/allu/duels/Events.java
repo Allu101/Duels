@@ -270,9 +270,12 @@ public class Events implements Listener, CommandExecutor {
 			return;
 		}
 		
-		if(!gameWhereJoined.isGameOn() || gameWhereJoined.isDamageDisabled()) {
+		if(!gameWhereJoined.isGameOn()) {
 			e.setCancelled(true);
 			return;
+		}
+		if (gameWhereJoined.isDamageDisabled()) {
+			e.setDamage(0.001);
 		}
 		
 		// Checks if player is under arena. The player is announced as being dead.
