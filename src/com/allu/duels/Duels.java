@@ -74,13 +74,13 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		this.getCommand("duelsreload").setExecutor(this);
 		this.getCommand("kits").setExecutor(this);
 		
-	    loadKitsFromConfig();
-	    
 	    ConfigurationSection arenaSection = config.getConfigurationSection("arenas");
 	    for (String key : arenaSection.getKeys(false)) {
 	    	createGames(key);
 	    	System.out.println("Created gameworld for " + key);
 	    }
+	    
+	    loadKitsFromConfig();
 		
 		
 		World world = Bukkit.getWorld(LOBBY_WORLD);
@@ -142,61 +142,63 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			String kitPath = "kits." + key;
 			List<ItemStack> kitItems = new ArrayList<>();
 			
-			for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {				
-				String itemPath = kitPath + ".items." + item;	
-				
-				
-				Material mat = Material.STONE;
-				if (Material.getMaterial(item) != null) {
-					mat = Material.getMaterial(item);
-				} else {
-					if (item.startsWith("potion")) {
-						mat = Material.POTION;
-					} else {
-						System.out.println("Error loading: " + itemPath);
-					}
-				}
-				
-				ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
-				
-				if (config.isConfigurationSection(itemPath)) {			
+			if (config.isConfigurationSection(kitPath + ".items")) {
+				for (String item : config.getConfigurationSection(kitPath + ".items").getKeys(false)) {				
+					String itemPath = kitPath + ".items." + item;	
 					
-					is.setAmount(config.getInt(itemPath + ".amount", 1));
 					
+					Material mat = Material.STONE;
 					if (Material.getMaterial(item) != null) {
 						mat = Material.getMaterial(item);
 					} else {
 						if (item.startsWith("potion")) {
 							mat = Material.POTION;
+						} else {
+							System.out.println("Error loading: " + itemPath);
 						}
 					}
 					
+					ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
+					
+					if (config.isConfigurationSection(itemPath)) {			
 						
-					String enchantmentsPath = itemPath + ".enchantments";
-					if (config.isConfigurationSection(enchantmentsPath)) {
-						for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
-							is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
+						is.setAmount(config.getInt(itemPath + ".amount", 1));
+						
+						if (Material.getMaterial(item) != null) {
+							mat = Material.getMaterial(item);
+						} else {
+							if (item.startsWith("potion")) {
+								mat = Material.POTION;
+							}
+						}
+						
+							
+						String enchantmentsPath = itemPath + ".enchantments";
+						if (config.isConfigurationSection(enchantmentsPath)) {
+							for (String enchantment : config.getConfigurationSection(enchantmentsPath).getKeys(false)) {
+								is.addUnsafeEnchantment(Enchantment.getByName(enchantment), config.getInt(enchantmentsPath + "." + enchantment));
+							}
+						}
+						
+						String potionTypePath = itemPath + ".potionEffect";
+						if (config.isSet(potionTypePath)) {
+							
+							Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
+							
+							if (config.getBoolean(itemPath + ".splash", false)) {
+								potion.setSplash(true);
+							}
+							potion.setLevel(config.getInt(itemPath + ".level", 1));
+							
+							// This line causes error: "Instant potions cannot be extended"
+							//potion.setHasExtendedDuration(config.getBoolean(itemPath + ".extended", false));
+							
+							potion.apply(is);
 						}
 					}
 					
-					String potionTypePath = itemPath + ".potionEffect";
-					if (config.isSet(potionTypePath)) {
-						
-						Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
-						
-						if (config.getBoolean(itemPath + ".splash", false)) {
-							potion.setSplash(true);
-						}
-						potion.setLevel(config.getInt(itemPath + ".level", 1));
-						
-						// This line causes error: "Instant potions cannot be extended"
-						//potion.setHasExtendedDuration(config.getBoolean(itemPath + ".extended", false));
-						
-						potion.apply(is);
-					}
+					kitItems.add(is);
 				}
-				
-				kitItems.add(is);
 			}
 			
 			String kitName = config.getString(kitPath + ".name") + " Duel";
