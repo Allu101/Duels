@@ -44,6 +44,8 @@ public class DuelsGame implements CountDownTimerListener {
 	private Kit kit;
 	
 	private Arena arena;
+	
+	private long gameStartTimeMillis;
 
 	
 	public DuelsGame(Lobby lobby, Arena arena, SimpleRanking winsRanking, SimpleRanking eloRanking) {
@@ -63,35 +65,54 @@ public class DuelsGame implements CountDownTimerListener {
 
 	@Override
 	public void onCountDownFinish() {
-		Bukkit.getScheduler().runTask(Duels.plugin, new Runnable() {
-
-			@Override
-			public void run() {
-				if (currentGameState == GameState.STARTING) {
-					currentGameState = GameState.PLAYING;
-					for (DuelsPlayer dp : players) {
-						Player p = dp.getPlayer();
-						p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
-						p.setHealth(p.getMaxHealth());
-						p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-								"title " + p.getName() + " times 0 20 10");
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-								"title " + p.getName() + " title {\"text\":\"Duels alkaa!\",\"bold\":true,\"color\":\"blue\"}");
-					}
-				} else if (currentGameState == GameState.GAME_FINISH) {
-					
-					for (DuelsPlayer dp : players) {
-						lobby.sendPlayerToLobby(dp);
-					}
-					
-					timer.clearPlayers();
-					players.clear();
-					currentGameState = GameState.FREE;
+		Bukkit.getScheduler().runTask(Duels.plugin, () -> {
+			
+			if (currentGameState == GameState.STARTING) {
+				
+				currentGameState = GameState.PLAYING;
+				for (DuelsPlayer dp : players) {
+					Player p = dp.getPlayer();
+					p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
+					p.setHealth(p.getMaxHealth());
+					p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							"title " + p.getName() + " times 0 20 10");
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+							"title " + p.getName() + " title {\"text\":\"Duels alkaa!\",\"bold\":true,\"color\":\"blue\"}");
 				}
+				gameStartTimeMillis = System.currentTimeMillis();
+				checkForDrawGame();
+				
+			} else if (currentGameState == GameState.GAME_FINISH) {
+				
+				for (DuelsPlayer dp : players) {
+					lobby.sendPlayerToLobby(dp);
+				}
+				
+				timer.clearPlayers();
+				players.clear();
+				currentGameState = GameState.FREE;
 			}
 		});
 	}
+	
+	private void checkForDrawGame() {
+		Bukkit.getScheduler().runTaskLater(Duels.plugin, () -> {
+			
+			if (currentGameState != GameState.PLAYING)
+				return;
+			
+			long timeElapsed = System.currentTimeMillis() - gameStartTimeMillis;
+			if (timeElapsed >= Duels.matchMinutesUntilDraw * 60 * 1000) {
+				// Draw game
+				gameEnd(null);
+			} else {
+				checkForDrawGame();
+			}
+			
+		}, 100);
+	}
+	
 	
 	public void onPlayerDie(Player deadPlayer) {	
 		deadPlayer.setGameMode(GameMode.SPECTATOR);
@@ -109,27 +130,30 @@ public class DuelsGame implements CountDownTimerListener {
 	public void gameEnd(DuelsPlayer winner) {	
 		currentGameState = GameState.GAME_FINISH;
 		
+		String winMessage = winner == null ? (ChatColor.GOLD + "Tasapeli")
+				: ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getPlayer().getName();
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
 			lobby.clearPotionEffect(p);
 			
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage("");
-			p.sendMessage(
-					messages.getCenteredMessage(ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getPlayer().getName()));
+			p.sendMessage(messages.getCenteredMessage(winMessage));
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			
-			if (dp.equals(winner)) {
-				dp.addWin();
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+					"title " + p.getName() + " times 0 80 20");
+			
+			if (winner == null) {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " times 0 80 20");
+						"title " + p.getName() + " title {\"text\":\"TASAPELI\",\"bold\":true,\"color\":\"yellow\"}");
+			} else if (dp.equals(winner)) {
+				dp.addWin();
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 						"title " + p.getName() + " title {\"text\":\"VOITTO\",\"bold\":true,\"color\":\"green\"}");
 			} else {
 				dp.addLose();
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " times 0 80 20");
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
 						"title " + p.getName() + " title {\"text\":\"TAPPIO\",\"bold\":true,\"color\":\"red\"}");
 			}
@@ -144,7 +168,10 @@ public class DuelsGame implements CountDownTimerListener {
 				if (dp != null && opponent != null) {
 					
 					double result = 0;
-					if (dp.equals(winner))
+					if (winner == null) {
+						result = 0.5;
+					}
+					else if (dp.equals(winner))
 						result = 1;
 					
 					double expectedScore = getExpectedScore(dp.getEloScore(), opponent.getEloScore());

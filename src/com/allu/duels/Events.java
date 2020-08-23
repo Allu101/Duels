@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -434,7 +435,7 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void creatureSpawn(CreatureSpawnEvent e) {
-		if(!e.getEntityType().equals(EntityType.ARMOR_STAND)) {
+		if(!e.getEntityType().equals(EntityType.ARMOR_STAND) && e.getSpawnReason() == SpawnReason.DEFAULT) {
 			e.setCancelled(true);
 		}
 	}

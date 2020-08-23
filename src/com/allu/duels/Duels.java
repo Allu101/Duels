@@ -30,6 +30,7 @@ import com.allu.minigameapi.ranking.SimpleRanking;
 public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	public static Duels plugin;
+	public static int matchMinutesUntilDraw = 15;
 	
     public FileConfiguration config;
     private File cFile;
@@ -80,7 +81,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	    	System.out.println("Created gameworld for " + key);
 	    }
 	    
-	    loadKitsFromConfig();
+	    applyConfig();
 		
 		
 		World world = Bukkit.getWorld(LOBBY_WORLD);
@@ -101,6 +102,12 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	public static String getLobbyWorldName() {
 		return LOBBY_WORLD;
+	}
+	
+	private void applyConfig() {
+		this.kits.clear();
+		this.loadKitsFromConfig();
+		Duels.matchMinutesUntilDraw = config.getInt("match-minutes-until-draw", 15);
 	}
 	
 	private void createGames(String arenaName) {
@@ -254,9 +261,8 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {	
 		if(cmd.getName().equalsIgnoreCase("duelsreload")) {
 			config = YamlConfiguration.loadConfiguration(cFile);
-			this.kits.clear();
-			this.loadKitsFromConfig();
-			sender.sendMessage("§aKits have been reloaded!");
+			applyConfig();
+			sender.sendMessage("§aConfiguration reloaded successfully");
 			sender.sendMessage("There are " + this.kits.size() + " kits.");
 		}
 		if(cmd.getName().equalsIgnoreCase("kits")) {
