@@ -1,6 +1,9 @@
 package com.allu.duels;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -145,9 +148,9 @@ public class Events implements Listener, CommandExecutor {
 				}
 				
 				DuelsPlayer targetDp = lobby.getDuelsPlayer(targetPlayer);
-
+				DuelsGame game = targetDp.getGameWhereJoined();
 				
-				if(targetDp.getGameWhereJoined() == null) {
+				if(game == null) {
 					p.sendMessage(ChatColor.RED + "Kyseinen pelaaja on tällä hetkellä lobbyssa");
 				}
 				else {
@@ -160,6 +163,16 @@ public class Events implements Listener, CommandExecutor {
 					
 					p.setGameMode(GameMode.SPECTATOR);
 					p.teleport(targetPlayer);
+					
+					p.setScoreboard(dp.getSidebarHandler().getSpectatorBoard());
+					
+					
+					List<String> playerNames = new ArrayList<>();
+					for (DuelsPlayer duelsPlayer : game.getPlayers()) {
+						playerNames.add(duelsPlayer.getPlayer().getName());
+					}
+					
+					dp.getSidebarHandler().updateSpectatorSidebar(game.getGameTypeString(), game.getKit().getName(), playerNames.toArray(new String[0]));
 				}
 
 			}
@@ -176,7 +189,7 @@ public class Events implements Listener, CommandExecutor {
 				dp.getGameWhereJoined().leaveGame(dp);
 			}
 			
-			lobby.teleportToSpawn(dp.getPlayer());
+			lobby.sendPlayerToLobby(dp);
 
 			return true;
 		}	

@@ -178,6 +178,9 @@ public class DuelsGame implements CountDownTimerListener {
 					double eloChange = (result - expectedScore) * 32 + 0.2; // + 0.2 for little total score increase over time.
 					int finalEloChange = (int)Math.round(eloChange);
 					
+					if (dp.getEloScore() + finalEloChange < 0) {
+						finalEloChange = -dp.getEloScore();
+					}
 					dp.setEloScore(dp.getEloScore() + finalEloChange);
 					
 					if (finalEloChange == 0) {
@@ -262,7 +265,7 @@ public class DuelsGame implements CountDownTimerListener {
 			if (opponent != null) {
 				opponentString = opponent.getPlayer().getName();
 			}
-			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(this.gameType), kit.getName(), opponentString);
+			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(), kit.getName(), opponentString);
 			
 			Bukkit.getScheduler().runTaskLater(Duels.plugin, new Runnable() {
 				@Override
@@ -332,7 +335,7 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	
-	private String getGameTypeString(GameType gameType) {
+	public String getGameTypeString() {
 		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "Kaverihaaste";
 		if (gameType.equals(GameType.RANKED)) return "Kilpailullinen";
 		return "???";
@@ -353,5 +356,13 @@ public class DuelsGame implements CountDownTimerListener {
 	
 	public boolean isUnderArena(Location loc) {
 		return this.arena.isUnderArena(loc);
+	}
+	
+	public Kit getKit() {
+		return kit;
+	}
+	
+	public List<DuelsPlayer> getPlayers() {
+		return this.players;
 	}
 }

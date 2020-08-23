@@ -14,9 +14,10 @@ public class PlayerSidebarHandler {
 	
 	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows("", "", ""));
 	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
+	private SidebarHandler spectatorSidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	
 	public PlayerSidebarHandler() {
-		gameSidebar.updateSidebar(getGameSidebarRows("", "", "")); // Is this necessary? -Ziigur
+		
 	}
 	
 	public Scoreboard getGameBoard() {
@@ -26,6 +27,10 @@ public class PlayerSidebarHandler {
 	public Scoreboard getLobbyBoard() {
 		return lobbySidebar.getBoard();
 	}
+	
+	public Scoreboard getSpectatorBoard() {
+		return spectatorSidebar.getBoard();
+	}
 
 	public void updateGameSidebar(String gameType, String kitName, String opponentName) {
 		gameSidebar.updateSidebar(getGameSidebarRows(gameType, kitName, opponentName));
@@ -33,6 +38,10 @@ public class PlayerSidebarHandler {
 	
 	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
 		lobbySidebar.updateSidebar(getLobbySidebarRows(wins, currentWinStreak, bestWinStreak, playedGames, eloScore));
+	}
+	
+	public void updateSpectatorSidebar(String gameType, String kitName, String...playerNames) {
+		spectatorSidebar.updateSidebar(getSpectatorSidebarRows(gameType, kitName, playerNames));
 	}
 	
 	private ArrayList<String> getGameSidebarRows(String gameType, String kitName, String opponentName) {
@@ -67,4 +76,21 @@ public class PlayerSidebarHandler {
 		return rows;
 	}
 	
+	private ArrayList<String> getSpectatorSidebarRows(String gameType, String kitName, String... playerNames) {
+		ArrayList<String> rows = new ArrayList<String>();
+		
+		rows.add("§f§lTyyppi:");
+		rows.add(ChatColor.GRAY + gameType);
+		rows.add("");
+		rows.add("§a§lKit:");
+		rows.add(ChatColor.GRAY + kitName);
+		rows.add("");
+		rows.add("§d§lPelaajat:");
+		for (int i = 0; i < playerNames.length; i++) {
+			rows.add(ChatColor.GRAY + playerNames[i]);
+		}
+		rows.add("");
+		rows.add(netAddress_row);
+		return rows;
+	}
 }
