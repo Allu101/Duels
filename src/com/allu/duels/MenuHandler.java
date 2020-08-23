@@ -7,9 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
 import com.allu.duels.utils.Kit;
-import com.allu.minigameapi.ItemHelpper;
+import com.allu.minigameapi.ItemHelper;
 
 public class MenuHandler {
 	
@@ -18,14 +17,12 @@ public class MenuHandler {
 	private ItemStack exitQueueItem;
 	
 	private Duels duels;
-	private ItemHelpper itemHelpper;
 
-	public MenuHandler(Duels duels, ItemHelpper itemHelper) {
+	public MenuHandler(Duels duels, ItemHelper itemHelper) {
 		this.duels = duels;
-		this.itemHelpper = itemHelper;
-		queueJoinItem = itemHelpper.createItemWithTitle(Material.IRON_SWORD, "§aPelaa kilpailullinen peli!");
-		challengeItem = itemHelpper.createItemWithTitle(Material.WOOD_SWORD, "§aHaasta kaveri lyömällä!");
-		exitQueueItem = itemHelpper.createItemWithTitle(Material.BARRIER, "§cPoistu jonosta");
+		queueJoinItem = itemHelper.createItemWithTitle(Material.IRON_SWORD, "§aPelaa kilpailullinen peli!");
+		challengeItem = itemHelper.createItemWithTitle(Material.WOOD_SWORD, "§aHaasta kaveri lyömällä!");
+		exitQueueItem = itemHelper.createItemWithTitle(Material.BARRIER, "§cPoistu jonosta");
 	}
 	
 	public Inventory createKitMenu() {

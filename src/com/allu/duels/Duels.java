@@ -24,7 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import com.allu.duels.utils.DatabaseHandler;
 import com.allu.duels.utils.Kit;
-import com.allu.minigameapi.ItemHelpper;
+import com.allu.minigameapi.ItemHelper;
 import com.allu.minigameapi.ranking.SimpleRanking;
 
 public class Duels extends JavaPlugin implements CommandExecutor {
@@ -40,7 +40,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	private ArrayList<Kit> kits = new ArrayList<>();
 	
 	private Events events;
-	private ItemHelpper itemHelpper = new ItemHelpper();
+	private ItemHelper itemHelper = new ItemHelper();
 	private Lobby lobby;
 	private MenuHandler menuHandler;	
 	
@@ -62,7 +62,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	    
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
-		menuHandler = new MenuHandler(this, itemHelpper);
+		menuHandler = new MenuHandler(this, itemHelper);
 		lobby = new Lobby(config, menuHandler);
 		events = new Events(lobby, menuHandler);
 		
@@ -202,7 +202,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			}
 			
 			String kitName = config.getString(kitPath + ".name") + " Duel";
-			ItemStack kitMenuItem = itemHelpper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")),
+			ItemStack kitMenuItem = itemHelper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")),
 					"§9" + kitName,
 					getKitMenuItemBodyText(kitItems));
 			
