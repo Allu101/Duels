@@ -15,6 +15,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -267,7 +268,7 @@ public class Events implements Listener, CommandExecutor {
 		menuHandler.inventoryClickHandler(lobby.getDuelsPlayer(p), e.getCurrentItem());
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent e){
 		
         if (lobby.isLobbyWorld(e.getEntity()))
