@@ -1,16 +1,11 @@
 package com.allu.duels.utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.allu.duels.DuelsPlayer;
 import com.allu.minigameapi.ranking.RankedPlayer;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 public class DatabaseHandler {
 	
@@ -124,11 +119,11 @@ public class DatabaseHandler {
 		}
 	}
 	
-	public synchronized ArrayList<RankedPlayer> loadTop10PlayersToWinsScoreboard() {
+	public synchronized ArrayList<RankedPlayer> loadPlayersToWinsScoreboard() {
 		openConnection();
-		ArrayList<RankedPlayer> players = new ArrayList<RankedPlayer>();
+		ArrayList<RankedPlayer> players = new ArrayList<>();
 		try {
-			PreparedStatement sql = connection.prepareStatement("SELECT uuid, name, wins FROM duels ORDER BY wins DESC LIMIT 10");
+			PreparedStatement sql = connection.prepareStatement("SELECT uuid, name, wins FROM duels ORDER BY wins DESC");
 			
 			ResultSet result = sql.executeQuery();
 
@@ -153,11 +148,11 @@ public class DatabaseHandler {
 	}
 	
 	
-	public synchronized ArrayList<RankedPlayer> loadTop10PlayersToEloScoreScoreboard() {
+	public synchronized ArrayList<RankedPlayer> loadPlayersToEloScoreScoreboard() {
 		openConnection();
-		ArrayList<RankedPlayer> players = new ArrayList<RankedPlayer>();
+		ArrayList<RankedPlayer> players = new ArrayList<>();
 		try {
-			PreparedStatement sql = connection.prepareStatement("SELECT uuid, name, eloScore FROM duels ORDER BY eloScore DESC LIMIT 10");
+			PreparedStatement sql = connection.prepareStatement("SELECT uuid, name, eloScore FROM duels ORDER BY eloScore DESC");
 			
 			ResultSet result = sql.executeQuery();
 

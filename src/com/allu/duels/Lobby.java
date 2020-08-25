@@ -1,8 +1,10 @@
 package com.allu.duels;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.allu.duels.DuelsGame.GameType;
+import com.allu.duels.utils.Kit;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -11,11 +13,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.potion.PotionEffect;
-import com.allu.duels.DuelsGame.GameType;
-import com.allu.duels.utils.Kit;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Lobby {
 	
@@ -187,9 +187,9 @@ public class Lobby {
 	/**
 	 * 
 	 * @param duelsPlayers
-	 * @param game
 	 * @param kit
 	 * @param gameType
+	 * @param activator
 	 */
 	public void startNewDuelsMatch(List<DuelsPlayer> duelsPlayers, Kit kit, GameType gameType, Player activator) {
 		
@@ -224,9 +224,7 @@ public class Lobby {
 	 * @param dp
 	 */
 	public void sendPlayerToLobby(DuelsPlayer dp) {
-		
 		System.out.println("Sending " + dp.getPlayer().getName() + " to lobby...");
-		
 		dp.setGameWhereJoined(null);
 		
 		dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
@@ -234,6 +232,8 @@ public class Lobby {
 				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames(), dp.getEloScore());
 		
 		teleportToSpawn(dp.getPlayer());
+		Duels.plugin.eloRanking.showTopListAndOwnStatsToPlayer(dp.getPlayer());
+		Duels.plugin.winsRanking.showTopListAndOwnStatsToPlayer(dp.getPlayer());
 		
 		boolean playerFound = false;
 		

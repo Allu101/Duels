@@ -1,22 +1,19 @@
 package com.allu.duels;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.ItemStack;
 import com.allu.duels.utils.FileHandler;
 import com.allu.duels.utils.Kit;
 import com.allu.minigameapi.CountDownTimer;
 import com.allu.minigameapi.CountDownTimerListener;
 import com.allu.minigameapi.MessageHandler;
+import com.allu.minigameapi.player.TitleHandler;
 import com.allu.minigameapi.ranking.SimpleRanking;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DuelsGame implements CountDownTimerListener {
 
@@ -44,6 +41,8 @@ public class DuelsGame implements CountDownTimerListener {
 	private Kit kit;
 	
 	private Arena arena;
+
+	private TitleHandler titleHandler = new TitleHandler();
 	
 	private long gameStartTimeMillis;
 
@@ -75,10 +74,7 @@ public class DuelsGame implements CountDownTimerListener {
 					p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 					p.setHealth(p.getMaxHealth());
 					p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							"title " + p.getName() + " times 0 20 10");
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-							"title " + p.getName() + " title {\"text\":\"Duels alkaa!\",\"bold\":true,\"color\":\"blue\"}");
+					titleHandler.sendTitle(p, "Duels alkaa!", ChatColor.BLUE, true);
 				}
 				gameStartTimeMillis = System.currentTimeMillis();
 				checkForDrawGame();
@@ -141,28 +137,22 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage(messages.getCenteredMessage(winMessage));
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
-			
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-					"title " + p.getName() + " times 0 80 20");
-			
+
 			if (winner == null) {
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " title {\"text\":\"TASAPELI\",\"bold\":true,\"color\":\"yellow\"}");
+				titleHandler.sendTitle(p, "TASAPELI", ChatColor.YELLOW, true);
+
 			} else if (dp.equals(winner)) {
 				dp.addWin();
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " title {\"text\":\"VOITTO\",\"bold\":true,\"color\":\"green\"}");
+				titleHandler.sendTitle(p, "VOITTO", ChatColor.GREEN, true);
 			} else {
 				dp.addLose();
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
-						"title " + p.getName() + " title {\"text\":\"TAPPIO\",\"bold\":true,\"color\":\"red\"}");
+				titleHandler.sendTitle(p, "TAPPIO", ChatColor.RED, true);
 			}
 			
 			if (gameType.equals(GameType.FRIEND_CHALLENGE)) {
 				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivät vaikuta ranking-pisteisiin");
 			}
 			else {
-				
 				DuelsPlayer opponent = getOtherPlayer(dp);
 				
 				if (dp != null && opponent != null) {
@@ -199,9 +189,8 @@ public class DuelsGame implements CountDownTimerListener {
 			
 			Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
 		}
-		
-		winsRanking.updateRankingWithPlayers(Duels.plugin.dbHandler.loadTop10PlayersToWinsScoreboard());
-		eloRanking.updateRankingWithPlayers(Duels.plugin.dbHandler.loadTop10PlayersToEloScoreScoreboard());
+		winsRanking.updateRanking(Duels.plugin.dbHandler.loadPlayersToWinsScoreboard());
+		eloRanking.updateRanking(Duels.plugin.dbHandler.loadPlayersToEloScoreScoreboard());
 		
 		timer.start(5, "");
 	}
@@ -267,13 +256,10 @@ public class DuelsGame implements CountDownTimerListener {
 			}
 			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(), kit.getName(), opponentString);
 			
-			Bukkit.getScheduler().runTaskLater(Duels.plugin, new Runnable() {
-				@Override
-				public void run() {
-					setKitItems(p, kit.getItems());
-					p.getPlayer().setFlying(false);
-					p.getPlayer().setAllowFlight(false);
-				}
+			Bukkit.getScheduler().runTaskLater(Duels.plugin, () -> {
+				setKitItems(p, kit.getItems());
+				p.getPlayer().setFlying(false);
+				p.getPlayer().setAllowFlight(false);
 			}, 5);
 		}
 		

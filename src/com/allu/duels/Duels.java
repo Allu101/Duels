@@ -1,14 +1,10 @@
 package com.allu.duels;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import com.allu.duels.utils.DatabaseHandler;
+import com.allu.duels.utils.Kit;
+import com.allu.minigameapi.ItemHelper;
+import com.allu.minigameapi.ranking.SimpleRanking;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,10 +18,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import com.allu.duels.utils.DatabaseHandler;
-import com.allu.duels.utils.Kit;
-import com.allu.minigameapi.ItemHelper;
-import com.allu.minigameapi.ranking.SimpleRanking;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Duels extends JavaPlugin implements CommandExecutor {
 	
@@ -45,8 +41,8 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	private Lobby lobby;
 	private MenuHandler menuHandler;	
 	
-	private SimpleRanking winsRanking;
-	private SimpleRanking eloRanking;	
+	public SimpleRanking winsRanking;
+	public SimpleRanking eloRanking;
 	
 	@Override
     public void onEnable() {
@@ -58,8 +54,8 @@ public class Duels extends JavaPlugin implements CommandExecutor {
         saveConfig();
         cFile = new File(getDataFolder(), "config.yml");
 	    
-	    winsRanking = new SimpleRanking(dbHandler.loadTop10PlayersToWinsScoreboard());
-	    eloRanking = new SimpleRanking(dbHandler.loadTop10PlayersToEloScoreScoreboard());
+	    winsRanking = new SimpleRanking(dbHandler.loadPlayersToWinsScoreboard());
+	    eloRanking = new SimpleRanking(dbHandler.loadPlayersToEloScoreScoreboard());
 	    
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
@@ -85,9 +81,9 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		
 		
 		World world = Bukkit.getWorld(LOBBY_WORLD);
-		winsRanking.addFloatingRankingList(new Location(world, 5.5, 11, -37.5),
+		winsRanking.addFloatingRankingList(new Location(world, 5.5, 12.5, -37.5),
 				"" + ChatColor.BLUE + ChatColor.BOLD + "- Voitot -", ChatColor.BLUE, ChatColor.GREEN);	
-		eloRanking.addFloatingRankingList(new Location(world, 27.5, 11, -15.5),
+		eloRanking.addFloatingRankingList(new Location(world, 27.5, 12.5, -15.5),
 				"" + ChatColor.BLUE + ChatColor.BOLD + "- Ranking-pisteet -", ChatColor.BLUE, ChatColor.GREEN);	
 	}
 	
