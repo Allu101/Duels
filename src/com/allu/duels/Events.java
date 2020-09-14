@@ -334,25 +334,27 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
-		
-		if (e.getPlayer().getInventory().getItemInHand().equals(menuHandler.getQueueItem())) {
-			
-			DuelsPlayer dpp = lobby.getDuelsPlayer(e.getPlayer());
+		Player p = e.getPlayer();
+		if (p.getInventory().getItemInHand().equals(menuHandler.getQueueItem())) {
+			DuelsPlayer dpp = lobby.getDuelsPlayer(p);
 			
 			if (dpp.getGameWhereJoined() == null) {
-				lobby.removeChallengesWithPlayers(lobby.getDuelsPlayer(e.getPlayer()));
-				lobby.addPlayerToRankedQueue(e.getPlayer());
-				
+				lobby.removeChallengesWithPlayers(lobby.getDuelsPlayer(p));
+				lobby.addPlayerToRankedQueue(p);
 			} else {
-				e.getPlayer().sendMessage("§cOlet jo pelissä!");
+				p.sendMessage("§cOlet jo pelissä!");
 			}
 		}
-		else if (e.getPlayer().getInventory().getItemInHand().equals(menuHandler.getExitQueueItem())) {
-			
-			DuelsPlayer dpp = lobby.getDuelsPlayer(e.getPlayer());
-			
+		else if (p.getInventory().getItemInHand().equals(menuHandler.getExitQueueItem())) {
+			DuelsPlayer dpp = lobby.getDuelsPlayer(p);
 			if (dpp.getGameWhereJoined() == null) {
-				lobby.removePlayerFromRankedQueue(e.getPlayer());
+				lobby.removePlayerFromRankedQueue(p);
+			}
+		}
+		else if (p.getInventory().getItemInHand().getType() == Material.ENDER_PEARL) {
+			DuelsPlayer dpp = lobby.getDuelsPlayer(p);
+			if (dpp.getGameWhereJoined() != null && !dpp.getGameWhereJoined().isGameOn()) {
+				e.setCancelled(true);
 			}
 		}
 	}
@@ -360,7 +362,7 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
 	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
 		final Player player = event.getPlayer();
-		 
+
         if (event.getItem().getType().equals(Material.POTION)) {
             Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(Duels.plugin, new Runnable() {
                 public void run() {
