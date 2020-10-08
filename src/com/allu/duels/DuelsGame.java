@@ -192,7 +192,7 @@ public class DuelsGame implements CountDownTimerListener {
 		winsRanking.updateRanking(Duels.plugin.dbHandler.loadPlayersToWinsScoreboard());
 		eloRanking.updateRanking(Duels.plugin.dbHandler.loadPlayersToEloScoreScoreboard());
 		
-		timer.start(5, "");
+		timer.start(5);
 	}
 	
 	private double getExpectedScore(int eloOwn, int eloOther) {
@@ -263,7 +263,7 @@ public class DuelsGame implements CountDownTimerListener {
 			}, 5);
 		}
 		
-		timer.start(3, "Duelsin alkuun");
+		timer.start(3, "Duelsin alkuun %time% sekuntia");
 		
 		FileHandler.increaseKitPlayedCount(kit.getName());
 	}

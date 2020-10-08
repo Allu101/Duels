@@ -4,6 +4,7 @@ package com.allu.duels;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.allu.anticheat.AntiCheatHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -39,13 +40,15 @@ import org.bukkit.inventory.ItemStack;
 
 
 public class Events implements Listener, CommandExecutor {
-	
+
+	private AntiCheatHandler antiCheatHandler;
 	private Lobby lobby;
 	private MenuHandler menuHandler;
 
 	public Events(Lobby lobby, MenuHandler menuHandler) {
 		this.lobby = lobby;
 		this.menuHandler = menuHandler;
+		antiCheatHandler = new AntiCheatHandler();
 	}
 	
 	@Override
@@ -268,31 +271,37 @@ public class Events implements Listener, CommandExecutor {
 		menuHandler.inventoryClickHandler(lobby.getDuelsPlayer(p), e.getCurrentItem());
 	}
 	
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH)
     public void onEntityDamage(EntityDamageEvent e){
-		
         if (lobby.isLobbyWorld(e.getEntity()))
         	e.setCancelled(true);
         
-        if(!(e.getEntity() instanceof Player)) {
+        if (!(e.getEntity() instanceof Player)) {
 			return;
 		}
 
 		Player damaged = (Player) e.getEntity();	
 		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(damaged).getGameWhereJoined();
 		
-		if(gameWhereJoined == null) {
+		if (gameWhereJoined == null) {
 			return;
 		}
 		
-		if(!gameWhereJoined.isGameOn()) {
+		if (!gameWhereJoined.isGameOn()) {
 			e.setCancelled(true);
 			return;
 		}
 		if (gameWhereJoined.isDamageDisabled()) {
 			e.setDamage(0.001);
 		}
-		
+
+		if (e instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent e2 = (EntityDamageByEntityEvent) e;
+			if (e2.getDamager() instanceof Player) {
+				antiCheatHandler.isTooHighCps(e2.getDamager().getName());
+			}
+		}
+
 		// Checks if player is under arena. The player is announced as being dead.
 		if (gameWhereJoined.isUnderArena(damaged.getLocation())) {
 			e.setCancelled(true);
@@ -310,15 +319,15 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
 	public void onPlayerDamage(EntityDamageByEntityEvent e) {
-		if(!(e.getEntity() instanceof Player)) {
+		if (!(e.getEntity() instanceof Player)) {
 			return;
 		}
 
 		Player damaged = (Player) e.getEntity();
-		if(lobby.isLobbyWorld(damaged)) {
+		if (lobby.isLobbyWorld(damaged)) {
 			e.setCancelled(true);
 			
-			if(!(e.getDamager() instanceof Player)) {
+			if (!(e.getDamager() instanceof Player)) {
 				return;
 			}
 			Player damager = (Player) e.getDamager();
@@ -326,8 +335,6 @@ public class Events implements Listener, CommandExecutor {
 			if (damager.getItemInHand().equals(menuHandler.getChallengeItem())) {
 				damager.performCommand("duel " + damaged.getName());
 			}
-			
-			return;
 		}
 	}
 	
@@ -375,18 +382,21 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
 		lobby.onPlayerJoin(e.getPlayer());
+		antiCheatHandler.onPlayerJoin(e.getPlayer().getName());
 	}
 	
 	@EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-		if(e.getPlayer() == null)
-			return;
-		DuelsPlayer dp = lobby.getDuelsPlayer(p);
-		if(dp == null) {
+		if (p == null) {
 			return;
 		}
-		if(dp.getGameWhereJoined() != null) {
+		antiCheatHandler.onPlayerLeave(p.getName());
+		DuelsPlayer dp = lobby.getDuelsPlayer(p);
+		if (dp == null) {
+			return;
+		}
+		if (dp.getGameWhereJoined() != null) {
 			dp.getGameWhereJoined().leaveGame(dp);
 		}
 		lobby.onPlayerLeave(dp);
