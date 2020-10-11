@@ -4,7 +4,6 @@ package com.allu.duels;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.allu.anticheat.AntiCheatHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -41,14 +40,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class Events implements Listener, CommandExecutor {
 
-	private AntiCheatHandler antiCheatHandler;
 	private Lobby lobby;
 	private MenuHandler menuHandler;
 
 	public Events(Lobby lobby, MenuHandler menuHandler) {
 		this.lobby = lobby;
 		this.menuHandler = menuHandler;
-		antiCheatHandler = new AntiCheatHandler();
 	}
 	
 	@Override
@@ -295,13 +292,6 @@ public class Events implements Listener, CommandExecutor {
 			e.setDamage(0.001);
 		}
 
-		if (e instanceof EntityDamageByEntityEvent) {
-			EntityDamageByEntityEvent e2 = (EntityDamageByEntityEvent) e;
-			if (e2.getDamager() instanceof Player) {
-				antiCheatHandler.isTooHighCps(e2.getDamager().getName());
-			}
-		}
-
 		// Checks if player is under arena. The player is announced as being dead.
 		if (gameWhereJoined.isUnderArena(damaged.getLocation())) {
 			e.setCancelled(true);
@@ -382,7 +372,6 @@ public class Events implements Listener, CommandExecutor {
 	@EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
 		lobby.onPlayerJoin(e.getPlayer());
-		antiCheatHandler.onPlayerJoin(e.getPlayer().getName());
 	}
 	
 	@EventHandler
@@ -391,7 +380,6 @@ public class Events implements Listener, CommandExecutor {
 		if (p == null) {
 			return;
 		}
-		antiCheatHandler.onPlayerLeave(p.getName());
 		DuelsPlayer dp = lobby.getDuelsPlayer(p);
 		if (dp == null) {
 			return;
