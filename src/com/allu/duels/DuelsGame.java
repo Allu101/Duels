@@ -150,7 +150,7 @@ public class DuelsGame implements CountDownTimerListener {
 			}
 			
 			if (gameType.equals(GameType.FRIEND_CHALLENGE)) {
-				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivät vaikuta ranking-pisteisiin");
+				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivÃ¤t vaikuta ranking-pisteisiin");
 			}
 			else {
 				DuelsPlayer opponent = getOtherPlayer(dp);
@@ -174,13 +174,13 @@ public class DuelsGame implements CountDownTimerListener {
 					dp.setEloScore(dp.getEloScore() + finalEloChange);
 					
 					if (finalEloChange == 0) {
-						p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivät muuttuneet pelin tuloksena.");
+						p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivï¿½t muuttuneet pelin tuloksena.");
 					}
 					else if (finalEloChange < 0) {
-						p.sendMessage(ChatColor.RED + "Menetit " + (-finalEloChange) + " ranking-pistettä");
+						p.sendMessage(ChatColor.RED + "Menetit " + (-finalEloChange) + " ranking-pistettÃ¤");
 					}
 					else if (finalEloChange > 0) {
-						p.sendMessage(ChatColor.GREEN + "Sait " + finalEloChange + " ranking-pistettä!");
+						p.sendMessage(ChatColor.GREEN + "Sait " + finalEloChange + " ranking-pistettÃ¤!");
 						p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0f);
 					}
 				}
