@@ -74,7 +74,7 @@ public class DuelsGame implements CountDownTimerListener {
 					p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 					p.setHealth(p.getMaxHealth());
 					p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
-					titleHandler.sendTitle(p, "Duels alkaa!", ChatColor.BLUE, true);
+					titleHandler.sendTitle(p, "§9§lDuels alkaa!");
 				}
 				gameStartTimeMillis = System.currentTimeMillis();
 				checkForDrawGame();
@@ -139,14 +139,14 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 
 			if (winner == null) {
-				titleHandler.sendTitle(p, "TASAPELI", ChatColor.YELLOW, true);
+				titleHandler.sendTitle(p, "§e§lTASAPELI");
 
 			} else if (dp.equals(winner)) {
 				dp.addWin();
-				titleHandler.sendTitle(p, "VOITTO", ChatColor.GREEN, true);
+				titleHandler.sendTitle(p, "§a§lVOITTO");
 			} else {
 				dp.addLose();
-				titleHandler.sendTitle(p, "TAPPIO", ChatColor.RED, true);
+				titleHandler.sendTitle(p, "§c§lTAPPIO");
 			}
 			
 			if (gameType.equals(GameType.FRIEND_CHALLENGE)) {
