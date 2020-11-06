@@ -206,7 +206,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			
 			String kitName = config.getString(kitPath + ".name") + " Duel";
 			ItemStack kitMenuItem = itemHelper.createItemWithTitle(Material.getMaterial(config.getString(kitPath + ".menuitem")),
-					"§9" + kitName,
+					"ï¿½9" + kitName,
 					getKitMenuItemBodyText(kitItems));
 			
 			String arenaType = config.getString(kitPath + ".arena", "default");
@@ -230,14 +230,14 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		
 		List<String> lines = new ArrayList<String>();
 		
-		lines.add("§r ");
-		lines.add("§fKitin sisältö:");
+		lines.add("Â§r ");
+		lines.add("Â§fKitin sisÃ¤ltÃ¤:");
 		
 		for (ItemStack item : items) {
 			
 			int amount = item.getAmount();
 			
-			lines.add("§7" + amount + "x " + getItemNameString(item));
+			lines.add("Â§7" + amount + "x " + getItemNameString(item));
 		}
 		
 		return lines.toArray(new String[lines.size()]);
@@ -258,7 +258,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		if(cmd.getName().equalsIgnoreCase("duelsreload")) {
 			config = YamlConfiguration.loadConfiguration(cFile);
 			applyConfig();
-			sender.sendMessage("§aConfiguration reloaded successfully");
+			sender.sendMessage("Â§aConfiguration reloaded successfully");
 			sender.sendMessage("There are " + this.kits.size() + " kits.");
 		}
 		if(cmd.getName().equalsIgnoreCase("kits")) {

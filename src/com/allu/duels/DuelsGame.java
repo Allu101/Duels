@@ -174,7 +174,7 @@ public class DuelsGame implements CountDownTimerListener {
 					dp.setEloScore(dp.getEloScore() + finalEloChange);
 					
 					if (finalEloChange == 0) {
-						p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eiv�t muuttuneet pelin tuloksena.");
+						p.sendMessage(ChatColor.GRAY + "Ranking-pisteesi eivät muuttuneet pelin tuloksena.");
 					}
 					else if (finalEloChange < 0) {
 						p.sendMessage(ChatColor.RED + "Menetit " + (-finalEloChange) + " ranking-pistettä");

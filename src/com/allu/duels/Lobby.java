@@ -95,10 +95,10 @@ public class Lobby {
 		Player challengedPlayer = challenged.getPlayer();
 		
 		if (challenger.getGameWhereJoined() != null) {
-			challengerPlayer.sendMessage(ChatColor.RED + "Et voi luoda haastetta, sill� olet itse peliss�!");
+			challengerPlayer.sendMessage(ChatColor.RED + "Et voi luoda haastetta, sillä olet itse pelissä!");
 		}
 		if (challenged.getGameWhereJoined() != null) {
-			challengerPlayer.sendMessage(ChatColor.RED + "Et voi luoda haastetta, sill� haastamasi pelaaja on jo peliss�!");
+			challengerPlayer.sendMessage(ChatColor.RED + "Et voi luoda haastetta, sillä haastamasi pelaaja on jo pelissä!");
 		}
 		
 		Challenge existingChallenge = this.getChallenge(challengerPlayer, challengedPlayer);
@@ -107,7 +107,7 @@ public class Lobby {
 			long timePassed = System.currentTimeMillis() - existingChallenge.getChallengeSendTime();
 			
 			if (timePassed < 20000) { // 20 seconds
-				challengerPlayer.sendMessage(ChatColor.RED + "Odota hetki ennen uuden haasteen l�hett�mist�!");
+				challengerPlayer.sendMessage(ChatColor.RED + "Odota hetki ennen uuden haasteen lähettämistä!");
 				return;
 			}
 		}
@@ -170,10 +170,10 @@ public class Lobby {
 		challenged.sendMessage(ChatColor.GREEN + challenge.getChallenger().getPlayer().getName() +
 				" haastoi sinut " + challenge.getKit().getName() + " duelsiin.");
 		
-		TextComponent msg1 = new TextComponent("Hyv�ksy haaste ");
+		TextComponent msg1 = new TextComponent("Hyväksy haaste ");
 		msg1.setColor(net.md_5.bungee.api.ChatColor.GREEN);
 		
-		TextComponent msg2 = new TextComponent("klikkaamalla t�st�!");
+		TextComponent msg2 = new TextComponent("klikkaamalla tästä!");
 		msg2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
 				"/duel accept " + challenge.getChallengeID()));
 		msg2.setColor(net.md_5.bungee.api.ChatColor.DARK_PURPLE);
@@ -196,7 +196,7 @@ public class Lobby {
 		DuelsGame game = getFreeGame(kit.getArenaType());
 		
 		if(game == null) {
-			activator.sendMessage(ChatColor.RED + "Vapaita pelej� ei t�ll� hetkell� ole.");
+			activator.sendMessage(ChatColor.RED + "Vapaita pelejä ei tällä hetkellä ole.");
 			return;
 		}
 		
@@ -209,7 +209,7 @@ public class Lobby {
 		}
 		
 		if (alreadyInGame) {
-			activator.sendMessage(ChatColor.RED + "Tapahtui virhe, peli� ei voida aloittaa!");
+			activator.sendMessage(ChatColor.RED + "Tapahtui virhe, peliä ei voida aloittaa!");
 			return;
 		}
 		
@@ -280,13 +280,13 @@ public class Lobby {
 		DuelsPlayer dpp = getDuelsPlayer(p);
 		
 		if (dpp.getGameWhereJoined() != null) {
-			p.sendMessage(ChatColor.RED + "Et voi liitty� jonoon, sill� olet peliss�!");
+			p.sendMessage(ChatColor.RED + "Et voi liittyä jonoon, sillä olet pelissä!");
 		}
 		
 		if (this.rankedQueue.size() > 0) {
 			
 			if (this.rankedQueue.contains(p)) {
-				p.sendMessage("�cOlet jo jonossa!");
+				p.sendMessage("§cOlet jo jonossa!");
 				return;
 			} else {
 				Player opponent = rankedQueue.get(0);
@@ -301,7 +301,7 @@ public class Lobby {
 					
 					if (dpOpponent.getGameWhereJoined() == null) {
 					
-						p.sendMessage("Vastustaja l�ytyi: " + opponent.getDisplayName());
+						p.sendMessage("Vastustaja läytyi: " + opponent.getDisplayName());
 						
 						List<DuelsPlayer> duelsPlayers = new ArrayList<DuelsPlayer>();
 						duelsPlayers.add(dpp);
@@ -320,7 +320,7 @@ public class Lobby {
 		}
 		
 		this.rankedQueue.add(p);
-		p.sendMessage("�aOdotat nyt vastustajaa peliin!");
+		p.sendMessage("§aOdotat nyt vastustajaa peliin!");
 		menuHandler.addExitQueueItemToPlayer(p);
 		dpp.setChallengedPlayer(null);
 		

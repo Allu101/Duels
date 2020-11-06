@@ -47,13 +47,13 @@ public class PlayerSidebarHandler {
 	private ArrayList<String> getGameSidebarRows(String gameType, String kitName, String opponentName) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
-		rows.add("§f§lTyyppi:");
+		rows.add("Â§fÂ§lTyyppi:");
 		rows.add(ChatColor.GRAY + gameType);
 		rows.add("");
-		rows.add("§a§lKit:");
+		rows.add("Â§aÂ§lKit:");
 		rows.add(ChatColor.GRAY + kitName);
 		rows.add("");
-		rows.add("§d§lVastustaja:");
+		rows.add("Â§dÂ§lVastustaja:");
 		rows.add(ChatColor.GRAY + opponentName);
 		rows.add("");
 		rows.add(netAddress_row);
@@ -79,13 +79,13 @@ public class PlayerSidebarHandler {
 	private ArrayList<String> getSpectatorSidebarRows(String gameType, String kitName, String... playerNames) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
-		rows.add("§f§lTyyppi:");
+		rows.add("Â§fÂ§lTyyppi:");
 		rows.add(ChatColor.GRAY + gameType);
 		rows.add("");
-		rows.add("§a§lKit:");
+		rows.add("Â§aÂ§lKit:");
 		rows.add(ChatColor.GRAY + kitName);
 		rows.add("");
-		rows.add("§d§lPelaajat:");
+		rows.add("Â§dÂ§lPelaajat:");
 		for (int i = 0; i < playerNames.length; i++) {
 			rows.add(ChatColor.GRAY + playerNames[i]);
 		}

@@ -20,9 +20,9 @@ public class MenuHandler {
 
 	public MenuHandler(Duels duels, ItemHelper itemHelper) {
 		this.duels = duels;
-		queueJoinItem = itemHelper.createItemWithTitle(Material.IRON_SWORD, "§aPelaa kilpailullinen peli!");
-		challengeItem = itemHelper.createItemWithTitle(Material.WOOD_SWORD, "§aHaasta kaveri lyömällä!");
-		exitQueueItem = itemHelper.createItemWithTitle(Material.BARRIER, "§cPoistu jonosta");
+		queueJoinItem = itemHelper.createItemWithTitle(Material.IRON_SWORD, "Â§aPelaa kilpailullinen peli!");
+		challengeItem = itemHelper.createItemWithTitle(Material.WOOD_SWORD, "Â§aHaasta kaveri lyÃ¶mÃ¤llÃ¤!");
+		exitQueueItem = itemHelper.createItemWithTitle(Material.BARRIER, "Â§cPoistu jonosta");
 	}
 	
 	public Inventory createKitMenu() {

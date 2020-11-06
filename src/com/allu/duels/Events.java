@@ -51,7 +51,7 @@ public class Events implements Listener, CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(!(sender instanceof Player)) {
-			System.out.println("[Duels] Komentoa ei voi k‰ytt‰‰ consolesta");
+			System.out.println("[Duels] Komentoa ei voi k√§ytt√§√§ consolesta");
 			return true;
 		}
 		
@@ -61,7 +61,7 @@ public class Events implements Listener, CommandExecutor {
 		if(cmd.getName().equalsIgnoreCase("duel")) {
 			
 			if (dp.getGameWhereJoined() != null) {
-				p.sendMessage("ßcEt voi tehd‰ t‰t‰, kun olet peliss‰!");
+				p.sendMessage("¬ßcEt voi tehd√§ t√§t√§, kun olet peliss√§!");
 				return true;
 			}
 			
@@ -76,13 +76,13 @@ public class Events implements Listener, CommandExecutor {
 				
 				Player opponent = Bukkit.getPlayerExact(args[0].toString());
 				if(opponent == null) {
-					p.sendMessage(ChatColor.RED + "T‰m‰n nimist‰ pelaajaa ei lˆydy.");
+					p.sendMessage(ChatColor.RED + "T√§m√§n nimist√§ pelaajaa ei l√∂ydy.");
 					return true;
 				}
 				DuelsPlayer opponentDp = lobby.getDuelsPlayer(opponent);
 				String opponentName = opponent.getName();
 				if(opponentDp.getGameWhereJoined() != null) {
-					p.sendMessage(ChatColor.RED + "Et voi haastaa pelaajaa " + opponentName + ", koska h‰nell‰ on peli menossa.");
+					p.sendMessage(ChatColor.RED + "Et voi haastaa pelaajaa " + opponentName + ", koska h√§nell√§ on peli menossa.");
 					return true;
 				}
 				if(args[0].equalsIgnoreCase(opponentName)) {
@@ -112,7 +112,7 @@ public class Events implements Listener, CommandExecutor {
 					
 					// Return failure, if non exist, or not pointed to the player.
 					if (challenge == null || !challenge.getChallenged().getPlayer().equals(p)) {
-						p.sendMessage(ChatColor.GRAY + "Haaste, jota koitat hyv‰ksy‰ ei ole voimassa.");
+						p.sendMessage(ChatColor.GRAY + "Haaste, jota koitat hyv√§ksy√§ ei ole voimassa.");
 						return true;
 					}
 					
@@ -139,12 +139,12 @@ public class Events implements Listener, CommandExecutor {
 				Player targetPlayer = Bukkit.getPlayerExact(args[0].toString());
 				
 				if(targetPlayer == null) {
-					p.sendMessage(ChatColor.RED + "T‰m‰n nimist‰ pelaajaa ei lˆydy.");
+					p.sendMessage(ChatColor.RED + "T√§m√§n nimist√§ pelaajaa ei l√∂ydy.");
 					return true;
 				}
 				
 				if (targetPlayer.equals(p)) {
-					p.sendMessage(ChatColor.RED + "Et voi spectatea itse‰si.");
+					p.sendMessage(ChatColor.RED + "Et voi spectatea itse√§si.");
 					return true;
 				}
 				
@@ -152,7 +152,7 @@ public class Events implements Listener, CommandExecutor {
 				DuelsGame game = targetDp.getGameWhereJoined();
 				
 				if(game == null) {
-					p.sendMessage(ChatColor.RED + "Kyseinen pelaaja on t‰ll‰ hetkell‰ lobbyssa");
+					p.sendMessage(ChatColor.RED + "Kyseinen pelaaja on t√§ll√§ hetkell√§ lobbyssa");
 				}
 				else {
 					if(dp.getGameWhereJoined() != null) {
@@ -178,7 +178,7 @@ public class Events implements Listener, CommandExecutor {
 
 			}
 			else {
-				p.sendMessage("ßcK‰yttˆ: /spectate <pelaajan nimi>");
+				p.sendMessage("¬ßcK√§ytt√∂: /spectate <pelaajan nimi>");
 			}
 			
 			return true;
@@ -339,7 +339,7 @@ public class Events implements Listener, CommandExecutor {
 				lobby.removeChallengesWithPlayers(lobby.getDuelsPlayer(p));
 				lobby.addPlayerToRankedQueue(p);
 			} else {
-				p.sendMessage("ßcOlet jo peliss‰!");
+				p.sendMessage("¬ßcOlet jo peliss√§!");
 			}
 		}
 		else if (p.getInventory().getItemInHand().equals(menuHandler.getExitQueueItem())) {
