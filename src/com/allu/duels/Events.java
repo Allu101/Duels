@@ -371,6 +371,7 @@ public class Events implements Listener, CommandExecutor {
 	
 	@EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
+		e.getPlayer().setFoodLevel(20);
 		lobby.onPlayerJoin(e.getPlayer());
 	}
 	
@@ -454,8 +455,13 @@ public class Events implements Listener, CommandExecutor {
 		}
 	}
 	
+	/**
+	 * Prevent hunger
+	 * @param e
+	 */
 	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent e) {
+		e.setFoodLevel(20);
 		e.setCancelled(true);
 	}
 }
