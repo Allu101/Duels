@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
 
@@ -463,5 +464,16 @@ public class Events implements Listener, CommandExecutor {
 	public void onFoodLevelChange(FoodLevelChangeEvent e) {
 		e.setFoodLevel(20);
 		e.setCancelled(true);
+	}
+	
+	/**
+	 * Prevent raining on any of the worlds
+	 * @param e
+	 */
+	@EventHandler
+	public void onWeatherChange(WeatherChangeEvent e) {
+		if (e.toWeatherState()) { // If starting to rain
+			e.setCancelled(true);
+		}
 	}
 }
