@@ -221,7 +221,7 @@ public class DuelsGame implements CountDownTimerListener {
 
 	public void leaveGame(DuelsPlayer dp) {
 		players.remove(dp);
-		if (players.size() > 0 && isGameOn()) {
+		if (players.size() > 0 && (isGameOn() || isGameStarting())) {
 			gameEnd(players.get(0));
 		}
 	}
