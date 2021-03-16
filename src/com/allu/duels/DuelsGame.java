@@ -71,6 +71,7 @@ public class DuelsGame implements CountDownTimerListener {
 				currentGameState = GameState.PLAYING;
 				for (DuelsPlayer dp : players) {
 					Player p = dp.getPlayer();
+					dp.gameDamageDone = 0;
 					p.playSound(p.getLocation(), Sound.NOTE_PLING, 1f, 0f);
 					p.setHealth(p.getMaxHealth());
 					p.sendMessage(ChatColor.GREEN + "Duels alkaa!");
@@ -138,22 +139,31 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 
+			DuelsPlayer opponent = getOtherPlayer(dp);
+			
 			if (winner == null) {
 				titleHandler.sendTitle(p, "§e§lTASAPELI");
+				p.sendMessage("§7Vastustajan HP: §6" + opponent.getPlayer().getHealth());
 
 			} else if (dp.equals(winner)) {
 				dp.addWin();
 				titleHandler.sendTitle(p, "§a§lVOITTO");
+				
 			} else {
 				dp.addLose();
 				titleHandler.sendTitle(p, "§c§lTAPPIO");
+				p.sendMessage("§7Vastustajan HP: §6" + opponent.getPlayer().getHealth());
 			}
+			
+			p.sendMessage("§7Vahinkoa tehty: §6" + Math.round(dp.gameDamageDone));
+			
+			
 			
 			if (gameType.equals(GameType.FRIEND_CHALLENGE)) {
 				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivät vaikuta ranking-pisteisiin");
 			}
 			else {
-				DuelsPlayer opponent = getOtherPlayer(dp);
+				
 				
 				if (dp != null && opponent != null) {
 					

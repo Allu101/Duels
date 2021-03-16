@@ -15,6 +15,8 @@ public class DuelsPlayer {
 	private int wins;
 	private int eloScore;
 	
+	double gameDamageDone = 0;
+	
 	public DuelsPlayer(Player p, PlayerSidebarHandler sidebarHandler) {
 		this.player = p;
 		this.sidebarHandler = sidebarHandler;

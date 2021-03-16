@@ -327,6 +327,10 @@ public class Events implements Listener, CommandExecutor {
 				damager.performCommand("duel " + damaged.getName());
 			}
 		}
+		
+		if ((e.getDamager() instanceof Player)) {
+			lobby.getDuelsPlayer((Player)e.getDamager()).gameDamageDone += e.getFinalDamage();
+		}
 	}
 	
 	
