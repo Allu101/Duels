@@ -78,8 +78,11 @@ public class Lobby {
 	}
 	
 	public void onPlayerJoin(Player p) {
-		DuelsPlayer dp = new DuelsPlayer(p, new PlayerSidebarHandler());
-		Duels.plugin.dbHandler.loadStatsSQL(dp);
+		final DuelsPlayer dp = new DuelsPlayer(p, new PlayerSidebarHandler());
+		Bukkit.getScheduler().runTaskAsynchronously(Duels.plugin, () -> {
+			Duels.plugin.dbHandler.loadStatsSQL(dp);
+			refreshLobbyStatsDisplay(dp);
+		});
 		sendPlayerToLobby(dp);
 	}
 	
@@ -224,19 +227,15 @@ public class Lobby {
 	 * @param dp
 	 */
 	public void sendPlayerToLobby(DuelsPlayer dp) {
-		System.out.println("Sending " + dp.getPlayer().getName() + " to lobby...");
 		dp.setGameWhereJoined(null);
-		
 		dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
-		dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
-				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames(), dp.getEloScore());
 		
 		teleportToSpawn(dp.getPlayer());
-		Duels.plugin.eloRanking.updatePlayerOwnStatsHologram(dp.getPlayer());
-		Duels.plugin.winsRanking.updatePlayerOwnStatsHologram(dp.getPlayer());
 		
+		refreshLobbyStatsDisplay(dp);
+		
+		// TODO Refactor this!
 		boolean playerFound = false;
-		
 		for (DuelsPlayer dp2 : players) {
 			if (dp2.is(dp.getPlayer().getUniqueId().toString())) {
 				playerFound = true;
@@ -247,9 +246,16 @@ public class Lobby {
 				dp2.setPlayedGames(dp.getPlayedGames());
 			}
 		}
-		
 		if (!playerFound)
 			players.add(dp);
+		
+		Duels.plugin.eloRanking.updatePlayerOwnStatsHologram(dp.getPlayer());
+		Duels.plugin.winsRanking.updatePlayerOwnStatsHologram(dp.getPlayer());
+	}
+	
+	private void refreshLobbyStatsDisplay(DuelsPlayer dp) {
+		dp.getSidebarHandler().updateLobbySidebarWinsAndWinStreaks(
+				dp.getWins(), dp.getCurrentWinStreak(), dp.getBestWinStreak(), dp.getPlayedGames(), dp.getEloScore());
 	}
 	
 	public void teleportToSpawn(Player p) {

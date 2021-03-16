@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -328,8 +329,14 @@ public class Events implements Listener, CommandExecutor {
 			}
 		}
 		
-		if ((e.getDamager() instanceof Player)) {
+		if (e.getDamager() instanceof Player) {
 			lobby.getDuelsPlayer((Player)e.getDamager()).gameDamageDone += e.getFinalDamage();
+		}
+		if (e.getDamager() instanceof Arrow) {
+			Arrow arrow = (Arrow)e.getDamager();
+			if (arrow.getShooter() instanceof Player) {
+				lobby.getDuelsPlayer((Player)arrow.getShooter()).gameDamageDone += e.getFinalDamage();
+			}
 		}
 	}
 	

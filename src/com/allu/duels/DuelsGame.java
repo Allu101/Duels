@@ -152,7 +152,7 @@ public class DuelsGame implements CountDownTimerListener {
 			} else {
 				dp.addLose();
 				titleHandler.sendTitle(p, "§c§lTAPPIO");
-				p.sendMessage("§7Vastustajan HP: §6" + opponent.getPlayer().getHealth());
+				p.sendMessage("§7Vastustajan HP: §6" + ((int)(opponent.getPlayer().getHealth() * 10.0) / 10.0));
 			}
 			
 			p.sendMessage("§7Vahinkoa tehty: §6" + Math.round(dp.gameDamageDone));
