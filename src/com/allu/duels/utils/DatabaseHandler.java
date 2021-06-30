@@ -31,10 +31,6 @@ public class DatabaseHandler {
 		}
 	}
 	
-	
-	
-	
-	
 	public synchronized void closeConnection() {
 		try {
     		if (connection != null && !connection.isClosed())
@@ -43,16 +39,18 @@ public class DatabaseHandler {
     		System.out.println("DatabaseHandler error - CloseConnetion()");
     	}
 	}
-	
-	
-	
-	
-	
-	public synchronized boolean saveStatsToDatabaseSQL(DuelsPlayer dp) {
+
+	public synchronized void saveStatsToDatabaseSQL(DuelsPlayer dp) {
 		openConnection();
+		saveStatsToDatabaseSQL(dp, "duels_alltime");
+		saveStatsToDatabaseSQL(dp, "duels");
+		closeConnection();
+	}
+	
+	public synchronized boolean saveStatsToDatabaseSQL(DuelsPlayer dp, String tableName) {
 		try {
 			PreparedStatement sql = connection.prepareStatement(
-					"INSERT INTO duels (uuid, name, wins, playedGames, currentWinStreak, highestWinStreak, eloScore) "
+					"INSERT INTO " + tableName + " (uuid, name, wins, playedGames, currentWinStreak, highestWinStreak, eloScore) "
 					+ "VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE "
 					+ "name=?, wins=?, playedGames=?, currentWinStreak=?, highestWinStreak=?, eloScore=?");
 			
@@ -73,13 +71,10 @@ public class DatabaseHandler {
 			
 			sql.executeUpdate();
 			sql.close();
-			
-			closeConnection();
 			return true;
 			
 		} catch (SQLException e) {
 			System.out.println("DatabaseHandler error - saveStatsToDatabaseSQL()");
-			closeConnection();
 			return false;
 		} catch (NullPointerException e) {
 			System.out.println("DatabaseHandler nullPointer - saveStatsToDatabaseSQL()");
