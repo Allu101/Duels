@@ -196,11 +196,14 @@ public class DuelsGame implements CountDownTimerListener {
 				}
 			}
 
-			
-			Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
 		}
-		winsRanking.updateRanking(Duels.plugin.dbHandler.loadPlayersToWinsScoreboard());
-		eloRanking.updateRanking(Duels.plugin.dbHandler.loadPlayersToEloScoreScoreboard());
+		Bukkit.getScheduler().runTaskAsynchronously(Duels.plugin, () -> {
+			for (DuelsPlayer dp : players) {
+				Duels.plugin.dbHandler.saveStatsToDatabaseSQL(dp);
+			}
+			Duels.plugin.dbHandler.loadAndUpdateWinsScoreboard(winsRanking);
+			Duels.plugin.dbHandler.loadAndUpdateEloScoreScoreboard(eloRanking);
+		});
 		
 		timer.start(5);
 	}

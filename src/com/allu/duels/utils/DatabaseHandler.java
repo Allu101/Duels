@@ -1,7 +1,10 @@
 package com.allu.duels.utils;
 
+import com.allu.duels.Duels;
 import com.allu.duels.DuelsPlayer;
 import com.allu.minigameapi.ranking.RankedPlayer;
+import com.allu.minigameapi.ranking.SimpleRanking;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.*;
@@ -114,7 +117,7 @@ public class DatabaseHandler {
 		}
 	}
 	
-	public synchronized ArrayList<RankedPlayer> loadPlayersToWinsScoreboard() {
+	public synchronized ArrayList<RankedPlayer> loadAndUpdateWinsScoreboard(SimpleRanking winsRanking) {
 		openConnection();
 		ArrayList<RankedPlayer> players = new ArrayList<>();
 		try {
@@ -129,7 +132,8 @@ public class DatabaseHandler {
 			result.close();
 			sql.close();
 			closeConnection();
-			
+
+			Bukkit.getScheduler().runTask(Duels.plugin, () -> winsRanking.updateRanking(players));
 			return players;
 			
 		} catch (SQLException e) {
@@ -143,7 +147,7 @@ public class DatabaseHandler {
 	}
 	
 	
-	public synchronized ArrayList<RankedPlayer> loadPlayersToEloScoreScoreboard() {
+	public synchronized ArrayList<RankedPlayer> loadAndUpdateEloScoreScoreboard(SimpleRanking eloRanking) {
 		openConnection();
 		ArrayList<RankedPlayer> players = new ArrayList<>();
 		try {
@@ -158,7 +162,8 @@ public class DatabaseHandler {
 			result.close();
 			sql.close();
 			closeConnection();
-			
+
+			Bukkit.getScheduler().runTask(Duels.plugin, () -> eloRanking.updateRanking(players));
 			return players;
 			
 		} catch (SQLException e) {

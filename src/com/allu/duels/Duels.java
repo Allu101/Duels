@@ -54,8 +54,10 @@ public class Duels extends JavaPlugin implements CommandExecutor {
         saveConfig();
         cFile = new File(getDataFolder(), "config.yml");
 	    
-	    winsRanking = new SimpleRanking(dbHandler.loadPlayersToWinsScoreboard());
-	    eloRanking = new SimpleRanking(dbHandler.loadPlayersToEloScoreScoreboard());
+	    winsRanking = new SimpleRanking(new ArrayList<>());
+	    eloRanking = new SimpleRanking(new ArrayList<>());
+		dbHandler.loadAndUpdateWinsScoreboard(winsRanking);
+		dbHandler.loadAndUpdateEloScoreScoreboard(eloRanking);
 	    
 		LOBBY_WORLD = config.getString("lobbyworldname");
 	    createWorldIfDoesntExist(LOBBY_WORLD);
