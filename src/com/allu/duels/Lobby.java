@@ -12,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ public class Lobby {
 			Duels.plugin.dbHandler.loadStatsSQL(dp);
 			refreshLobbyStatsDisplay(dp);
 		});
+		players.add(dp);
 		sendPlayerToLobby(dp);
 	}
 	
@@ -228,29 +230,15 @@ public class Lobby {
 	 */
 	public void sendPlayerToLobby(DuelsPlayer dp) {
 		dp.setGameWhereJoined(null);
-		dp.getPlayer().setScoreboard(dp.getSidebarHandler().getLobbyBoard());
+		Player player = dp.getPlayer();
+		player.setScoreboard(dp.getSidebarHandler().getLobbyBoard());
 		
-		teleportToSpawn(dp.getPlayer());
+		teleportToSpawn(player);
 		
 		refreshLobbyStatsDisplay(dp);
 		
-		// TODO Refactor this!
-		boolean playerFound = false;
-		for (DuelsPlayer dp2 : players) {
-			if (dp2.is(dp.getPlayer().getUniqueId().toString())) {
-				playerFound = true;
-				dp2.setWins(dp.getWins());
-				dp2.setBestWinStreak(dp.getBestWinStreak());
-				dp2.setCurrentWinStreak(dp.getCurrentWinStreak());
-				dp2.setEloScore(dp.getEloScore());
-				dp2.setPlayedGames(dp.getPlayedGames());
-			}
-		}
-		if (!playerFound)
-			players.add(dp);
-		
-		Duels.plugin.eloRanking.updatePlayerOwnStatsHologram(dp.getPlayer());
-		Duels.plugin.winsRanking.updatePlayerOwnStatsHologram(dp.getPlayer());
+		Duels.plugin.eloRanking.updatePlayerOwnStatsHologram(player);
+		Duels.plugin.winsRanking.updatePlayerOwnStatsHologram(player);
 	}
 	
 	private void refreshLobbyStatsDisplay(DuelsPlayer dp) {
@@ -262,17 +250,16 @@ public class Lobby {
 		p.teleport(spawnLocation, TeleportCause.PLUGIN);
 		p.setGameMode(GameMode.ADVENTURE);
 		p.setHealth(20);
-		clearPlayerInventoryAndEquipment(p);
+		clearPlayerInventoryAndEquipment(p.getInventory());
 		menuHandler.setLobbyItems(p);
 	}
 	
-	
-	public void clearPlayerInventoryAndEquipment(Player player) {
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
+	public void clearPlayerInventoryAndEquipment(PlayerInventory playerInventory) {
+		playerInventory.clear();
+		playerInventory.setHelmet(null);
+		playerInventory.setChestplate(null);
+		playerInventory.setLeggings(null);
+		playerInventory.setBoots(null);
 	}
 	
 	public void clearPotionEffect(Player p) {

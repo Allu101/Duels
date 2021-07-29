@@ -161,7 +161,7 @@ public class Events implements Listener, CommandExecutor {
 						dp.getGameWhereJoined().leaveGame(dp);
 					}
 					
-					lobby.clearPlayerInventoryAndEquipment(p);
+					lobby.clearPlayerInventoryAndEquipment(p.getInventory());
 					lobby.clearPotionEffect(p);
 					
 					p.setGameMode(GameMode.SPECTATOR);

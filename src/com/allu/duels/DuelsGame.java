@@ -11,6 +11,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,27 +96,25 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	private void checkForDrawGame() {
-		Bukkit.getScheduler().runTaskLater(Duels.plugin, () -> {
-			
-			if (currentGameState != GameState.PLAYING)
-				return;
-			
-			long timeElapsed = System.currentTimeMillis() - gameStartTimeMillis;
-			if (timeElapsed >= Duels.matchMinutesUntilDraw * 60 * 1000) {
-				// Draw game
-				gameEnd(null);
-			} else {
-				checkForDrawGame();
+		if (currentGameState != GameState.PLAYING)
+			return;
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				long timeElapsed = System.currentTimeMillis() - gameStartTimeMillis;
+				if (timeElapsed >= Duels.matchMillisecondsUntilDraw) {
+					// Draw game
+					gameEnd(null);
+					cancel();
+				}
 			}
-			
-		}, 100);
+		}.runTaskTimer(Duels.plugin, 1000, 100);
 	}
-	
 	
 	public void onPlayerDie(Player deadPlayer) {	
 		deadPlayer.setGameMode(GameMode.SPECTATOR);
 		deadPlayer.getWorld().strikeLightningEffect(deadPlayer.getLocation());
-		lobby.clearPlayerInventoryAndEquipment(deadPlayer);
+		lobby.clearPlayerInventoryAndEquipment(deadPlayer.getInventory());
 		
 		for (DuelsPlayer dp : players) {
 			if (!dp.getPlayer().equals(deadPlayer)) {
@@ -158,12 +158,10 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage("§7Vahinkoa tehty: §6" + Math.round(dp.gameDamageDone));
 			
 			
-			
 			if (gameType.equals(GameType.FRIEND_CHALLENGE)) {
 				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivät vaikuta ranking-pisteisiin");
 			}
 			else {
-				
 				
 				if (dp != null && opponent != null) {
 					
@@ -240,11 +238,9 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 
 	public void startGame(List<DuelsPlayer> dplayers, Kit kit, GameType gameType) {
-		
-		this.kit = kit;
-		
 		currentGameState = GameState.STARTING;
-		
+
+		this.kit = kit;
 		this.players = dplayers;
 		this.gameType = gameType;
 		
@@ -271,8 +267,8 @@ public class DuelsGame implements CountDownTimerListener {
 			
 			Bukkit.getScheduler().runTaskLater(Duels.plugin, () -> {
 				setKitItems(p, kit.getItems());
-				p.getPlayer().setFlying(false);
-				p.getPlayer().setAllowFlight(false);
+				p.setFlying(false);
+				p.setAllowFlight(false);
 			}, 5);
 		}
 		
@@ -282,22 +278,23 @@ public class DuelsGame implements CountDownTimerListener {
 	}
 	
 	private void setKitItems(Player p, List<ItemStack> items) {
-		
-		p.getInventory().clear();
+
+		PlayerInventory pInv = p.getInventory();
+		pInv.clear();
 		
 		for (ItemStack is : items) {
 			String itemTypeString = is.getType().toString();
 			if (itemTypeString.contains("HELMET")) {
-				p.getInventory().setHelmet(new ItemStack(is));
+				pInv.setHelmet(new ItemStack(is));
 			}
 			else if (itemTypeString.contains("LEGGINGS")) {
-				p.getInventory().setLeggings(new ItemStack(is));
+				pInv.setLeggings(new ItemStack(is));
 			}
 			else if (itemTypeString.contains("CHESTPLATE")) {
-				p.getInventory().setChestplate(new ItemStack(is));
+				pInv.setChestplate(new ItemStack(is));
 			}
 			else if (itemTypeString.contains("_BOOTS")) {
-				p.getInventory().setBoots(new ItemStack(is));
+				pInv.setBoots(new ItemStack(is));
 			}
 			else {
 				if (is.getMaxStackSize() == 1) {
@@ -305,11 +302,11 @@ public class DuelsGame implements CountDownTimerListener {
 					ItemStack oneItemIS = new ItemStack(is);
 					oneItemIS.setAmount(1);
 					for (int i = 0; i < count; i++) {
-						p.getInventory().addItem(new ItemStack(oneItemIS));
+						pInv.addItem(new ItemStack(oneItemIS));
 					}
 				}
 				else {
-					p.getInventory().addItem(new ItemStack(is));
+					pInv.addItem(new ItemStack(is));
 				}
 			}
 		}
