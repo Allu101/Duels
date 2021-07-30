@@ -26,7 +26,7 @@ import java.util.List;
 public class Duels extends JavaPlugin implements CommandExecutor {
 	
 	public static Duels plugin;
-	public static int matchMillisecondsUntilDraw = 900000; //1000 * 60 * minutes (15)
+	public static int matchMillisecondsUntilDraw;
 	
     public FileConfiguration config;
     private File cFile;
@@ -105,7 +105,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 	private void applyConfig() {
 		this.kits.clear();
 		this.loadKitsFromConfig();
-		Duels.matchMillisecondsUntilDraw = config.getInt("match-minutes-until-draw", 15);
+		Duels.matchMillisecondsUntilDraw = config.getInt("match-minutes-until-draw", 15) * 60 * 1000;
 	}
 	
 	private void createGames(String arenaName) {
