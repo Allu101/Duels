@@ -2,10 +2,12 @@ package com.allu.duels;
 
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class DuelsPlayer {
 
 	private Player player;
-	private DuelsPlayer challengedPlayer;
+	private List<DuelsPlayer> challengedPlayers;
 	private DuelsGame gameWhereJoined = null;
 	private PlayerSidebarHandler sidebarHandler;
 	
@@ -43,8 +45,8 @@ public class DuelsPlayer {
 		return bestWinStreak;
 	}
 	
-	public DuelsPlayer getChallengedPlayer() {
-		return challengedPlayer;
+	public List<DuelsPlayer> getChallengedPlayers() {
+		return challengedPlayers;
 	}
 	
 	public int getCurrentWinStreak() {
@@ -95,8 +97,8 @@ public class DuelsPlayer {
 		this.bestWinStreak = bestWinStreak;
 	}
 	
-	public void setChallengedPlayer(DuelsPlayer dp) {
-		this.challengedPlayer = dp;
+	public void setChallengedPlayers(List<DuelsPlayer> players) {
+		this.challengedPlayers = players;
 	}
 	
 	public void setGameWhereJoined(DuelsGame gameWhereJoined) {

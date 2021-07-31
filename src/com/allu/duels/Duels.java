@@ -270,7 +270,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 			}
 			DuelsPlayer dp = lobby.getDuelsPlayer((Player)sender);
 			if (dp != null) {
-				dp.setChallengedPlayer(null);
+				dp.setChallengedPlayers(null);
 				((Player)sender).openInventory(this.menuHandler.createKitMenu());	
 			}
 		}

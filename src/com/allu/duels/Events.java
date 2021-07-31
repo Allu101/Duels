@@ -72,29 +72,30 @@ public class Events implements Listener, CommandExecutor {
 				return true;
 			}
 			
-			if(args.length == 1) {
-				
+			if(args.length % 2 != 0) {
 				lobby.removePlayerFromRankedQueue(p);
-				
-				Player opponent = Bukkit.getPlayerExact(args[0].toString());
-				if(opponent == null) {
-					p.sendMessage(ChatColor.RED + "Tämän nimistä pelaajaa ei löydy.");
-					return true;
-				}
-				DuelsPlayer opponentDp = lobby.getDuelsPlayer(opponent);
-				String opponentName = opponent.getName();
-				if(opponentDp.getGameWhereJoined() != null) {
-					p.sendMessage(ChatColor.RED + "Et voi haastaa pelaajaa " + opponentName + ", koska hänellä on peli menossa.");
-					return true;
-				}
-				if(args[0].equalsIgnoreCase(opponentName)) {
-					if(p.getName().equals(opponentName)) {
+				List<DuelsPlayer> players = new ArrayList<>();
+
+				for (String name : args) {
+					Player opponent = Bukkit.getPlayerExact(name);
+					if(opponent == null) {
+						p.sendMessage(ChatColor.RED + name + " nimistä pelaajaa ei löydy.");
+						return true;
+					}
+					DuelsPlayer opponentDp = lobby.getDuelsPlayer(opponent);
+					if (opponent.getName().equals(p.getName())) {
 						p.sendMessage(ChatColor.RED + "Et voi haastaa itseasi duelsiin.");
 						return true;
 					}
-					p.openInventory(menuHandler.createKitMenu());
-					dp.setChallengedPlayer(opponentDp);
+					if(opponentDp.getGameWhereJoined() != null) {
+						p.sendMessage(ChatColor.RED + "Et voi haastaa pelaajaa " + name + ", koska hänellä on peli menossa.");
+						return true;
+					}
+					players.add(opponentDp);
 				}
+				dp.setChallengedPlayers(players);
+				p.openInventory(menuHandler.createKitMenu());
+
 				return true;
 			}
 			
@@ -113,23 +114,23 @@ public class Events implements Listener, CommandExecutor {
 					Challenge challenge = lobby.getChallenge(challengeID);
 					
 					// Return failure, if non exist, or not pointed to the player.
-					if (challenge == null || !challenge.getChallenged().getPlayer().equals(p)) {
+					if (challenge == null || !challenge.getChallengedPlayers().contains(dp)) {
 						p.sendMessage(ChatColor.GRAY + "Haaste, jota koitat hyväksyä ei ole voimassa.");
 						return true;
 					}
-					
-					lobby.startNewDuelsMatch(
-							challenge.getDuelsPlayers(),
-							challenge.getKit(),
-							DuelsGame.GameType.FRIEND_CHALLENGE,
-							p);
+					challenge.acceptChallenge(p.getUniqueId().toString());
+
+					if (challenge.hasAllAccept()) {
+						lobby.startNewDuelsMatch(challenge.getDuelsPlayers(), challenge.getKit(),
+								DuelsGame.GameType.FRIEND_CHALLENGE, p);
+					}
 					
 					return true;
 				}
 			}
 			p.sendMessage(lobby.LINE);
-			p.sendMessage(ChatColor.AQUA + "/duel <pelaajan_nimi>");
-			//p.sendMessage(ChatColor.AQUA + "/duel accept <pelaajan_nimi>.");
+			p.sendMessage(ChatColor.AQUA + "(1v1) /duel <pelaajan_nimi>");
+			p.sendMessage(ChatColor.AQUA + "(2v2) /duel <pelaajan1_nimi> <pelaajan2_nimi> <pelaajan3_nimi>.");
 			p.sendMessage(lobby.LINE);
 			return true;
 		}

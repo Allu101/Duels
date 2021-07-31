@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,9 @@ public class DuelsGame implements CountDownTimerListener {
 
 	private GameType gameType;
 
-	private List<DuelsPlayer> players = new ArrayList<DuelsPlayer>();
+	private List<DuelsPlayer> players = new ArrayList<>();
+	private List<DuelsPlayer> team1 = new ArrayList<>();
+	private List<DuelsPlayer> team2 = new ArrayList<>();
 
 	private Lobby lobby;
 	private MessageHandler messages;
@@ -90,6 +93,8 @@ public class DuelsGame implements CountDownTimerListener {
 				
 				timer.clearPlayers();
 				players.clear();
+				team1.clear();
+				team2.clear();
 				currentGameState = GameState.FREE;
 			}
 		});
@@ -104,7 +109,7 @@ public class DuelsGame implements CountDownTimerListener {
 				long timeElapsed = System.currentTimeMillis() - gameStartTimeMillis;
 				if (timeElapsed >= Duels.matchMillisecondsUntilDraw) {
 					// Draw game
-					gameEnd(null);
+					gameEnd(new ArrayList<>());
 					cancel();
 				}
 			}
@@ -115,20 +120,22 @@ public class DuelsGame implements CountDownTimerListener {
 		deadPlayer.setGameMode(GameMode.SPECTATOR);
 		deadPlayer.getWorld().strikeLightningEffect(deadPlayer.getLocation());
 		lobby.clearPlayerInventoryAndEquipment(deadPlayer.getInventory());
-		
-		for (DuelsPlayer dp : players) {
-			if (!dp.getPlayer().equals(deadPlayer)) {
-				gameEnd(dp);
-				return;
-			}
-		}
+
+		gameEnd(getOpponentPlayers(lobby.getDuelsPlayer(deadPlayer)));
 	}
 
-	public void gameEnd(DuelsPlayer winner) {	
+	public void gameEnd(List<DuelsPlayer> winnerTeam) {
 		currentGameState = GameState.GAME_FINISH;
-		
-		String winMessage = winner == null ? (ChatColor.GOLD + "Tasapeli")
-				: ChatColor.GREEN + "Voittaja: " + ChatColor.GOLD + winner.getPlayer().getName();
+
+		String winnersMsg = "";
+		if (winnerTeam.size() != 0) {
+			for (DuelsPlayer winner : winnerTeam) {
+				winnersMsg = String.join(" ", winnersMsg, winner.getPlayer().getName());
+			}
+			winnersMsg = winnersMsg.substring(1).replace(" ", ", ");
+		}
+		winnersMsg = winnerTeam.size() == 1 ? "Voittaja: " + ChatColor.GOLD + winnersMsg : "Voittajat: " + ChatColor.GOLD + winnersMsg;
+		String winMessage = winnerTeam.size() == 0 ? ChatColor.GOLD + "Tasapeli" : ChatColor.GREEN + winnersMsg;
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
 			lobby.clearPotionEffect(p);
@@ -137,26 +144,23 @@ public class DuelsGame implements CountDownTimerListener {
 			p.sendMessage("");
 			p.sendMessage(messages.getCenteredMessage(winMessage));
 			p.sendMessage("");
-			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 
-			DuelsPlayer opponent = getOtherPlayer(dp);
+			List<DuelsPlayer> opponent = getOpponentPlayers(dp);
 			
-			if (winner == null) {
+			if (winnerTeam.size() == 0) {
 				titleHandler.sendTitle(p, "§e§lTASAPELI");
-				p.sendMessage("§7Vastustajan HP: §6" + opponent.getPlayer().getHealth());
 
-			} else if (dp.equals(winner)) {
+			} else if (winnerTeam.contains(dp)) {
 				dp.addWin();
 				titleHandler.sendTitle(p, "§a§lVOITTO");
-				
 			} else {
 				dp.addLose();
 				titleHandler.sendTitle(p, "§c§lTAPPIO");
-				p.sendMessage("§7Vastustajan HP: §6" + ((int)(opponent.getPlayer().getHealth() * 10.0) / 10.0));
+				p.sendMessage("§7Vastustajan HP: §6" + new DecimalFormat("00.#").format(getOpponentPlayers(winnerTeam.get(0)).get(0).getPlayer().getHealth()));
 			}
 			
 			p.sendMessage("§7Vahinkoa tehty: §6" + Math.round(dp.gameDamageDone));
-			
+			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			
 			if (gameType.equals(GameType.FRIEND_CHALLENGE)) {
 				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivät vaikuta ranking-pisteisiin");
@@ -166,13 +170,13 @@ public class DuelsGame implements CountDownTimerListener {
 				if (dp != null && opponent != null) {
 					
 					double result = 0;
-					if (winner == null) {
+					if (winnerTeam == null) {
 						result = 0.5;
 					}
-					else if (dp.equals(winner))
+					else if (dp.equals(winnerTeam))
 						result = 1;
 					
-					double expectedScore = getExpectedScore(dp.getEloScore(), opponent.getEloScore());
+					double expectedScore = getExpectedScore(dp.getEloScore(), getOpponentPlayers(winnerTeam.get(0)).get(0).getEloScore());
 					double eloChange = (result - expectedScore) * 32 + 0.2; // + 0.2 for little total score increase over time.
 					int finalEloChange = (int)Math.round(eloChange);
 					
@@ -232,23 +236,26 @@ public class DuelsGame implements CountDownTimerListener {
 
 	public void leaveGame(DuelsPlayer dp) {
 		players.remove(dp);
-		if (players.size() > 0 && (isGameOn() || isGameStarting())) {
-			gameEnd(players.get(0));
+		if (players.size() > 0 && players.size() - getOpponentPlayers(dp).size() < 1 && (isGameOn() || isGameStarting())) {
+			gameEnd(getOpponentPlayers(dp));
 		}
 	}
 
-	public void startGame(List<DuelsPlayer> dplayers, Kit kit, GameType gameType) {
+	public void startGame(List<DuelsPlayer> team1, List<DuelsPlayer> team2, Kit kit, GameType gameType) {
 		currentGameState = GameState.STARTING;
 
 		this.kit = kit;
-		this.players = dplayers;
+		this.players.addAll(team1);
+		this.players.addAll(team2);
+		this.team1 = team1;
+		this.team2 = team2;
 		this.gameType = gameType;
 		
 		this.arena.clearArrows();
 		
 		teleportPlayersToSpawnPoints();
 		
-		for (DuelsPlayer dp : dplayers) {
+		for (DuelsPlayer dp : players) {
 			dp.setGameWhereJoined(this);
 			
 			Player p = dp.getPlayer();
@@ -258,12 +265,10 @@ public class DuelsGame implements CountDownTimerListener {
 			lobby.clearPotionEffect(p);
 			p.setScoreboard(dp.getSidebarHandler().getGameBoard());
 			
-			DuelsPlayer opponent = this.getOtherPlayer(dp);
-			String opponentString = "";
-			if (opponent != null) {
-				opponentString = opponent.getPlayer().getName();
-			}
-			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(), kit.getName(), opponentString);
+			List<DuelsPlayer> otherTeamPlayers = this.getOpponentPlayers(dp);
+			List<String> opponentNames = new ArrayList<>();
+			otherTeamPlayers.forEach(opponent -> opponentNames.add(opponent.getPlayer().getName()));
+			dp.getSidebarHandler().updateGameSidebar(getGameTypeString(), kit.getName(), opponentNames);
 			
 			Bukkit.getScheduler().runTaskLater(Duels.plugin, () -> {
 				setKitItems(p, kit.getItems());
@@ -321,15 +326,9 @@ public class DuelsGame implements CountDownTimerListener {
 		}
 	}
 	
-	private DuelsPlayer getOtherPlayer(DuelsPlayer dpp) {
-		for (DuelsPlayer dpp2: this.players) {
-			if (!dpp.equals(dpp2)) {
-				return dpp2;
-			}
-		}
-		return null;
+	private List<DuelsPlayer> getOpponentPlayers(DuelsPlayer dp) {
+		return team1.contains(dp) ? team2 : team1;
 	}
-	
 	
 	public String getGameTypeString() {
 		if (gameType.equals(GameType.FRIEND_CHALLENGE)) return "Kaverihaaste";

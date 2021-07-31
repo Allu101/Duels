@@ -41,8 +41,8 @@ public class MenuHandler {
 	public void inventoryClickHandler(DuelsPlayer dp, ItemStack is) {
 		for(Kit kit : duels.getKits()) {
 			if(is.equals(kit.getMenuItem())) {
-				if (dp.getChallengedPlayer() != null) {
-					duels.getLobby().createNewChallenge(dp, dp.getChallengedPlayer(), kit);
+				if (dp.getChallengedPlayers() != null) {
+					duels.getLobby().createNewChallenge(dp, dp.getChallengedPlayers(), kit);
 				}
 				dp.getPlayer().closeInventory();
 			}

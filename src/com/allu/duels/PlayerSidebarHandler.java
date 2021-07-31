@@ -1,6 +1,7 @@
 package com.allu.duels;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Scoreboard;
@@ -12,7 +13,7 @@ public class PlayerSidebarHandler {
 	private String header = ChatColor.BLUE + "" + ChatColor.BOLD + " Duels ";
 	private String netAddress_row = ChatColor.GOLD + "www.slinkoncraft.net";
 	
-	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows("", "", ""));
+	private SidebarHandler gameSidebar = new SidebarHandler(header, getGameSidebarRows("", "", new ArrayList<>()));
 	private SidebarHandler lobbySidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	private SidebarHandler spectatorSidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	
@@ -32,8 +33,8 @@ public class PlayerSidebarHandler {
 		return spectatorSidebar.getBoard();
 	}
 
-	public void updateGameSidebar(String gameType, String kitName, String opponentName) {
-		gameSidebar.updateSidebar(getGameSidebarRows(gameType, kitName, opponentName));
+	public void updateGameSidebar(String gameType, String kitName, List<String> opponentNames) {
+		gameSidebar.updateSidebar(getGameSidebarRows(gameType, kitName, opponentNames));
 	}
 	
 	public void updateLobbySidebarWinsAndWinStreaks(int wins, int currentWinStreak, int bestWinStreak, int playedGames, int eloScore) {
@@ -44,7 +45,7 @@ public class PlayerSidebarHandler {
 		spectatorSidebar.updateSidebar(getSpectatorSidebarRows(gameType, kitName, playerNames));
 	}
 	
-	private ArrayList<String> getGameSidebarRows(String gameType, String kitName, String opponentName) {
+	private ArrayList<String> getGameSidebarRows(String gameType, String kitName, List<String> opponentNames) {
 		ArrayList<String> rows = new ArrayList<String>();
 		
 		rows.add("§f§lTyyppi:");
@@ -54,7 +55,9 @@ public class PlayerSidebarHandler {
 		rows.add(ChatColor.GRAY + kitName);
 		rows.add("");
 		rows.add("§d§lVastustaja:");
-		rows.add(ChatColor.GRAY + opponentName);
+		for (String name : opponentNames) {
+			rows.add(ChatColor.GRAY + name);
+		}
 		rows.add("");
 		rows.add(netAddress_row);
 		return rows;
