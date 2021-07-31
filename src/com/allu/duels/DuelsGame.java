@@ -166,14 +166,13 @@ public class DuelsGame implements CountDownTimerListener {
 				p.sendMessage(ChatColor.GRAY + "Kaveripelit eivät vaikuta ranking-pisteisiin");
 			}
 			else {
-				
-				if (dp != null && opponent != null) {
+				if (dp != null && !opponent.isEmpty()) {
 					
 					double result = 0;
-					if (winnerTeam == null) {
+					if (winnerTeam.isEmpty()) {
 						result = 0.5;
 					}
-					else if (dp.equals(winnerTeam))
+					else if (winnerTeam.contains(dp))
 						result = 1;
 					
 					double expectedScore = getExpectedScore(dp.getEloScore(), getOpponentPlayers(winnerTeam.get(0)).get(0).getEloScore());
