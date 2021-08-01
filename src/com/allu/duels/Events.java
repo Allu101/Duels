@@ -477,15 +477,5 @@ public class Events implements Listener, CommandExecutor {
 		e.setFoodLevel(20);
 		e.setCancelled(true);
 	}
-	
-	/**
-	 * Prevent raining on any of the worlds
-	 * @param e
-	 */
-	@EventHandler
-	public void onWeatherChange(WeatherChangeEvent e) {
-		if (e.toWeatherState()) { // If starting to rain
-			e.setCancelled(true);
-		}
-	}
+
 }
