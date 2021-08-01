@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffectType;
@@ -164,6 +165,8 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 					}
 					
 					ItemStack is = new ItemStack(mat, config.getInt(itemPath, 1));
+
+					String displayName = mat.name().toLowerCase().replace('_', ' ');
 					
 					if (config.isConfigurationSection(itemPath)) {			
 						
@@ -176,7 +179,6 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 								mat = Material.POTION;
 							}
 						}
-						
 							
 						String enchantmentsPath = itemPath + ".enchantments";
 						if (config.isConfigurationSection(enchantmentsPath)) {
@@ -187,6 +189,7 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 						
 						String potionTypePath = itemPath + ".potionEffect";
 						if (config.isSet(potionTypePath)) {
+							displayName = config.getString(potionTypePath).toLowerCase() + " " + displayName;
 							
 							Potion potion = new Potion(PotionType.getByEffect(PotionEffectType.getByName(config.getString(potionTypePath))));
 							
@@ -200,7 +203,12 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 							
 							potion.apply(is);
 						}
+
 					}
+
+					ItemMeta meta = is.getItemMeta();
+					meta.setDisplayName(displayName.substring(0, 1).toUpperCase() + displayName.substring(1));
+					is.setItemMeta(meta);
 					
 					kitItems.add(is);
 				}
@@ -233,22 +241,13 @@ public class Duels extends JavaPlugin implements CommandExecutor {
 		List<String> lines = new ArrayList<String>();
 		
 		lines.add("§r ");
-		lines.add("§fKitin sisältä:");
+		lines.add("§fKitin sisältö:");
 		
 		for (ItemStack item : items) {
-			
-			int amount = item.getAmount();
-			
-			lines.add("§7" + amount + "x " + getItemNameString(item));
+			lines.add("§7" + item.getAmount() + "x " + item.getItemMeta().getDisplayName());
 		}
 		
 		return lines.toArray(new String[lines.size()]);
-	}
-	
-	private String getItemNameString(ItemStack item) {
-		String name = item.getType().toString().toLowerCase().replace('_', ' ');
-		name = name.substring(0, 1).toUpperCase() + name.substring(1);
-		return name;
 	}
 	
 	public Lobby getLobby() {
