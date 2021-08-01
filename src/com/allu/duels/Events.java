@@ -1,14 +1,7 @@
 package com.allu.duels;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,18 +19,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Events implements Listener, CommandExecutor {
@@ -200,7 +187,30 @@ public class Events implements Listener, CommandExecutor {
 		
 		return false;
 	}
-	
+
+	@EventHandler
+	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent e) {
+		Player p = e.getPlayer();
+		DuelsGame game = lobby.getDuelsPlayer(p).getGameWhereJoined();
+		if(game != null && game.isGameOn()) {
+			if(game != null && game.isGameOn()) {
+				game.getPlacedBlocks().add(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation());
+				return;
+			}
+		}
+		e.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onPlayerBucketFill(PlayerBucketFillEvent e) {
+		Player p = e.getPlayer();
+		DuelsGame game = lobby.getDuelsPlayer(p).getGameWhereJoined();
+		if(game != null && game.isGameOn()) {
+			game.getPlacedBlocks().remove(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation());
+		}
+		e.setCancelled(true);
+	}
+
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
 		Player p = e.getPlayer();

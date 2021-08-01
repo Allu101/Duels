@@ -140,6 +140,9 @@ public class DuelsGame implements CountDownTimerListener {
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
 			lobby.clearPotionEffect(p);
+			for (Location loc : getPlacedBlocks()) {
+				loc.getBlock().setType(Material.AIR);
+			}
 
 			Scoreboard scoreboard = p.getScoreboard();
 			getOwnTeamPlayers(dp).forEach(teamMate -> scoreboard.getTeam("own").removeEntry(teamMate.getPlayer().getName()));
