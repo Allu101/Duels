@@ -1,12 +1,11 @@
 package com.allu.duels;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.allu.minigameapi.player.SidebarHandler;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Scoreboard;
 
-import com.allu.minigameapi.player.SidebarHandler;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerSidebarHandler {
 	
@@ -18,7 +17,8 @@ public class PlayerSidebarHandler {
 	private SidebarHandler spectatorSidebar = new SidebarHandler(header, getLobbySidebarRows(0, 0, 0, 0, 0));
 	
 	public PlayerSidebarHandler() {
-		
+		getGameBoard().registerNewTeam("own").setPrefix(ChatColor.GREEN + "");
+		getGameBoard().registerNewTeam("opponent").setPrefix(ChatColor.DARK_PURPLE + "");
 	}
 	
 	public Scoreboard getGameBoard() {

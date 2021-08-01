@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -139,6 +140,10 @@ public class DuelsGame implements CountDownTimerListener {
 		for (DuelsPlayer dp : players) {
 			Player p = dp.getPlayer();
 			lobby.clearPotionEffect(p);
+
+			Scoreboard scoreboard = p.getScoreboard();
+			getOwnTeamPlayers(dp).forEach(teamMate -> scoreboard.getTeam("own").removeEntry(teamMate.getPlayer().getName()));
+			getOpponentPlayers(dp).forEach(opponent -> scoreboard.getTeam("opponent").removeEntry(opponent.getPlayer().getName()));
 			
 			p.sendMessage(messages.getCenteredMessage(lobby.LINE));
 			p.sendMessage("");
@@ -274,6 +279,10 @@ public class DuelsGame implements CountDownTimerListener {
 				p.setFlying(false);
 				p.setAllowFlight(false);
 			}, 5);
+
+			Scoreboard scoreboard = p.getScoreboard();
+			getOwnTeamPlayers(dp).forEach(teamMate -> scoreboard.getTeam("own").addEntry(teamMate.getPlayer().getName()));
+			getOpponentPlayers(dp).forEach(opponent -> scoreboard.getTeam("opponent").addEntry(opponent.getPlayer().getName()));
 		}
 		
 		timer.start(3, "Duelsin alkuun %time% sekuntia");
@@ -327,6 +336,10 @@ public class DuelsGame implements CountDownTimerListener {
 	
 	private List<DuelsPlayer> getOpponentPlayers(DuelsPlayer dp) {
 		return team1.contains(dp) ? team2 : team1;
+	}
+
+	private List<DuelsPlayer> getOwnTeamPlayers(DuelsPlayer dp) {
+		return team1.contains(dp) ? team1 : team2;
 	}
 	
 	public String getGameTypeString() {
