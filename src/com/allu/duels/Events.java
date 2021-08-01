@@ -409,12 +409,12 @@ public class Events implements Listener, CommandExecutor {
 		
 		if (e.getPlayer() == null)
 			return;
-		
-		Player p = e.getPlayer();
-		
+
 		if (e.getCause().equals(TeleportCause.PLUGIN)) {
 			return;
 		}
+
+		Player p = e.getPlayer();
 		
 		if (e.getCause().equals(TeleportCause.SPECTATE)) {
 			e.setCancelled(true);
@@ -425,20 +425,25 @@ public class Events implements Listener, CommandExecutor {
 			p.setSpectatorTarget(p);
 			return;
 		}
-		
-		if (e.getCause().equals(TeleportCause.ENDER_PEARL)) {
 
-			DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
-			
-			if (gameWhereJoined != null &&
-					(!gameWhereJoined.isWithinArena(e.getTo()) || !gameWhereJoined.isNearArenaFloorLevel(e.getTo().getY()))) {
+		DuelsGame gameWhereJoined = lobby.getDuelsPlayer(p).getGameWhereJoined();
+
+		if (gameWhereJoined != null) {
+			if (e.getCause().equals(TeleportCause.ENDER_PEARL)) {
+				if (!gameWhereJoined.isWithinArena(e.getTo()) || !gameWhereJoined.isNearArenaFloorLevel(e.getTo().getY())) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
+				} else {
+					e.setCancelled(true);
+					p.teleport(e.getTo());
+				}
+				return;
+			}
+
+			if (e.getCause().equals(TeleportCause.COMMAND)) {
 				e.setCancelled(true);
 				p.sendMessage(ChatColor.RED + "Areenalta ei saa poistua!");
-			} else {
-				e.setCancelled(true);
-				p.teleport(e.getTo());
 			}
-			return;
 		}
 	}
 	
